@@ -1,0 +1,51 @@
+Przyłączenie się do rozgrywki
+
+primary actor: użytkownik Androida (gracz)
+
+basic flow I:
+	1. użytkownik widzi ekran z wyborem: 
+		- dołącz do gry
+		- stwórz nową grę
+	2. użytkownik wybiera "dołącz do gry"
+	3. wyświetla się ekran z możliwością wpisania username osoby, która stworzyła grę
+	4. użytkownik wpisuje poprawny username
+	5. serwer przyłącza gracza do rozgrywki
+	6. gracz dostaje wiadomość o sukcesie
+	7. użytkownik przechodzi do ekrany lobby
+
+basic flow II:
+	1. użytkownik widzi ekran z wyborem: 
+		- dołącz do gry
+		- stwórz nową grę
+	2. użytkownik wybiera "stwórz nową grę"
+	3. wyświetla się ekran z możliwością podania danych do nowej rozgrywki
+	4. gracz wybiera opcje rozgrywki
+	5. serwer zatwierdza opcje i tworzy rozgrywkę
+	6. użytkownik przechodzi do ekranu lobby
+
+alternative flows I:
+	4. wpisany przez gracza username nie ma przypisanej gotowej do rozpoczęcia rozgrywki lub nie istnieje
+	5. użytkownik przechodzi do ekranu wyboru z odpowiednim komunikatem
+	
+	5. w rozgrywce jest już maksymalna liczba osób
+	6. użytkownik wraca do ekranu wyboru, widzi komunikat o niepowodzeniu
+	
+	7. gra nie rozpoczyna się w ciągu godziny od stworzenia
+	8. serwer usuwa grę
+	9. gracze dostają stosowny komunikat i wracają do ekranu wyboru
+	
+alternative flows II:
+	5. serwer nie może obsłużyć większej ilości rozgrywek
+	6. gracz dostaje wiadomość o niepowodzeniu i wraca do wyboru
+	
+	6. gra nie rozpoczyna się w ciągu godziny od stworzenia
+	7. serwer usuwa grę
+	8. gracze dostają stosowny komunikat i wracają do ekranu wyboru
+
+preconditions:
+	- użytkownik jest zalogowany
+	- serwer działa
+
+post conditions:
+	- gracz widzi ekran wyboru
+	- gracz jest w lobby

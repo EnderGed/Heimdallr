@@ -1,0 +1,38 @@
+Zalogowanie do gry
+
+primary actor: użytkownik Androida (gracz)
+
+basic flow:
+	1. użytkownik włącza aplikację
+	2. pojawia się okno logowania (pola login, hasło; przyciski login, rejestracja)
+	3. użytkownik wpisuje poprawny login i hasło, naciska login
+	4. serwer weryfikuje dane i przesyła odpowiedź
+	5. pojawia się okno gry (przeglądanie gier, na razie gracz nie jest w żadnej drużynie)
+
+alternative flows:
+	3. użytkownik wpisuje niepoprawne dane
+	4. serwer odrzuca dane
+	5. użytkownik widzi informację o błędnych danych, pola login i hasło oraz dodatkowo przycisk "zapomniałam hasła"
+	6. jeśli użytkownik naciśnie "zapomniałam hasła", to wyświetli się prośba o podanie maila; nowe hasło zostanie wysłane na maila
+	
+	3. użytkownik chce się zarejestrować
+	4. pojawia się ekran rejestracji: pola login, email, zapora anty-botowa
+	5. użytkownik wpisuje zajęty login albo nie pokonuje zapory
+	6. pojawia się ten sam ekran rejestracji z odpowiednim komunikatem o błędzie
+	
+	3. użytkownik chce się zarejestrować
+	4. pojawia się ekran rejestracji: pola login, email, zapora anty-botowa
+	5. gracz podaje poprawne dane
+	6. serwer akceptuje dane
+	7. wygenerowane hasło zostaje wysłane na maila (jeśli użytkownik nie zaloguje się w ciągu 7 dni, to konto zostaje skasowane)
+	8. gracz loguje się
+	9. zmienia hasło
+
+preconditions:
+	- aplikacja jest zainstalowana na urządzeniu
+	- urządzenie ma połączenie z internetem
+	- serwer działa
+	
+post conditions:
+	- użytkownik jest zalogowany
+	- użytkownik dalej widzi ekran logowania
