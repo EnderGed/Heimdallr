@@ -1,0 +1,24 @@
+1 + polozenie						polozenie
+2 + zasieg + opoznienie				bomba
+3 									stworz gre
+4 + ID_gry							dolacz do gry
+5 + login + haslo					logowanie
+6 									wylogowanie
+7 + login + adres					rejestracja
+8									wyjscie z rozgrywki
+9 									zakonczenie gry /???????
+10 login + sare_haslo nowe_haslo	zmiana hasla????
+11 adres							nowe haslo (zapomniany login)
+12 + rozwiazanie					rozwiazanie puzzli
+13									start gry
+
+pewnie coœ trzeba jeszcze dodaæ - jak macie pomys³y, to piszcie
+
+
+odpowiedzi do androida 
+cos w stylu
+
+1		ok
+0		zle ???????
+czekam na propozycje
+jak na razie, to odpowiadalam stringami, ¿eby mi by³o ³atwiej ogarn¹æ xD
