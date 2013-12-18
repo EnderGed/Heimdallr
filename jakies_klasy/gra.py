@@ -35,19 +35,19 @@ class Game():
 		self.points = None
 		self.teams = []
 		self.ready_bombs = PriorityQueue()
-		self.waiting_bombs = []
+		self.waiting_bombs = deque()
 		
 	def get_phase(self): 
 		return self.phase
 		
 	def add_player(self, p):
-		if self.phase != 0: raise GameError(1)
+		if self.get_phase() != 0: raise GameError(1)
 		if p in self.players: raise GameError(3,'player exists')
 		
 		self.players.append(p)
 		
 	def add_team(self, teamname):
-		if self.phase != 0: raise GameError(1)
+		if self.get_phase() != 0: raise GameError(1)
 		if len(self.teams) >= 2: raise GameError(2,'too many teams')
 		if teamname in self.teams: raise GameError(3,'team exists')
 		
@@ -66,7 +66,7 @@ class Game():
 	def load_points(self, filename):
 		
 		#check if everything else is done
-		if self.phase != 0: raise GameError(1)
+		if self.get_phase() != 0: raise GameError(1)
 		if len(self.teams) != 2: raise GameError(2,'number of teams should be 2: '+str(len(self.teams)))
 		if len(self.players) < 5: raise GameError(2,'should have more than 5 players: '+str(len(self.players)))
 		for p in self.players:
@@ -91,7 +91,7 @@ class Game():
 		self.phase = 2
 		
 	def start(self):
-		if self.phase != 2: raise GameError(1)
+		if self.get_phase() != 2: raise GameError(1)
 		self.phase = 3
 		#start threads
 		Exploder(self).start()
@@ -116,13 +116,13 @@ class Game():
 					for p in game.players:
 						if bomb.is_in_range(p):
 							p.set_alive(False)
+					self.waiting_bombs.remove(bomb)
 				else:
 					game.ready_bombs.put(bomb)
 
 	def update_player(self,player):
 		
 		bombs_in_range = [b for b in self.waiting_bombs if b.is_in_range(player)]
-		self.waiting_bombs = [b for b in self.waiting_bombs if not b.is_in_range(player)]
 		if bombs_in_range != []:
 			#send info to player
 			for b in bombs_in_range:
@@ -134,3 +134,12 @@ class Game():
 		if points[ctr].is_in(player):
 			#send info
 			pass
+			
+	def score_point(self,player,point):
+		
+		l, ctr = self.points[player.get_team()]
+		if l[ctr] == point:
+			if ctr == len(l):
+				#game won!!!
+				pass
+			self.points[player.get_team()] = (l,ctr+1)
