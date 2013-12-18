@@ -1,3 +1,6 @@
+wszystkie komunikaty kończymy EOF
+maksymalny rozmiar komunikatu 40 bajtów? więcej?
+
 użytkownik -> serwer
 
 gra
