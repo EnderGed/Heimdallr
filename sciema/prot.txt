@@ -1,18 +1,20 @@
 1 + polozenie						polozenie
-2 + zasieg + opoznienie				bomba
-3 									stworz gre
-4 + ID_gry							dolacz do gry
-5 + login + haslo					logowanie
+2 + polozenie						bomba
+3 									stworz gre							lobby
+4 + ID_gry							dolacz do gry						lobby
+5 + login + haslo					logowanie							
 6 									wylogowanie
 7 + login + adres					rejestracja
 8									wyjscie z rozgrywki
 9 									zakonczenie gry /???????
 10 login + sare_haslo nowe_haslo	zmiana hasla????
 11 adres							nowe haslo (zapomniany login)
-12 + rozwiazanie					rozwiazanie puzzli
-13									start gry
+12 + bool zaliczone					mini-gra skończona					game
+13									start gry							lobby
+14 + boolean						zmiana/wybór drużyny				lobby
 
-pewnie co� trzeba jeszcze doda� - jak macie pomys�y, to piszcie
+
+pewnie co trzeba jeszcze dodaæ - jak macie pomys³y, to piszcie
 
 
 odpowiedzi do androida 
@@ -20,5 +22,16 @@ cos w stylu
 
 1		ok
 0		zle ???????
+
+2 + nazwy (2 stringi z \0)			drużyny								lobby
+3 + bool drużyna + nazwa gracza		gracz dołączył do gry				lobby
+4 									wszedłeś w bombe					game
+5									umarłeś								game
+6 + położenie, zasięg				bomba wybuchła						game
+7 + nr mini-gry						doszliście na punkt					game
+8 + byte rodzaj + byte array		wskazówka							game
+9 + byte							koniec gry							game										
 czekam na propozycje
-jak na razie, to odpowiadalam stringami, �eby mi by�o �atwiej ogarn�� xD
+jak na razie, to odpowiadalam stringami, ¿eby mi by³o ³atwiej ogarn¹æ xD
+
+TABELA Z BOMBAMI!!!!!!!!!
