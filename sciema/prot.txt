@@ -1,5 +1,5 @@
 wszystkie komunikaty kończymy EOF
-maksymalny rozmiar komunikatu 40 bajtów? więcej?
+maksymalny rozmiar komunikatu 1024 bajtów? więcej?
 
 użytkownik -> serwer
 
