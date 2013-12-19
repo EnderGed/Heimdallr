@@ -1,37 +1,40 @@
-1 + polozenie						polozenie
-2 + polozenie						bomba
-3 									stworz gre							lobby
-4 + ID_gry							dolacz do gry						lobby
-5 + login + haslo					logowanie							
-6 									wylogowanie
-7 + login + adres					rejestracja
-8									wyjscie z rozgrywki
-9 									zakonczenie gry /???????
-10 login + sare_haslo nowe_haslo	zmiana hasla????
-11 adres							nowe haslo (zapomniany login)
-12 + bool zaliczone					mini-gra skończona					game
-13									start gry							lobby
-14 + boolean						zmiana/wybór drużyny				lobby
+użytkownik -> serwer
 
+gra
+	1 + polozenie						polozenie
+	2 + polozenie						bomba
+	3									wyjscie z rozgrywki
+	4 									zakonczenie gry
+	5 + bool zaliczone					mini-gra skończona
+	
+lobby
+	101 								stworz gre
+	102 + ID_gry						dolacz do gry
+	103									start gry
+	104 + boolean						zmiana/wybór drużyny
+	
+inne
+	201 + login + haslo					logowanie							
+	202									wylogowanie
+	203 + login + adres					rejestracja
+	204 + login + sare_haslo nowe_haslo	zmiana hasla????
+	205	+ adres							nowe haslo (zapomniany login)
+	
+	
+serwer -> użytkownik
 
-pewnie co trzeba jeszcze dodaæ - jak macie pomys³y, to piszcie
+zwykłe odpowiedzi
+	201		ok
+	200		zle
 
+gra
+	1 									wszedłeś w bombe
+	2									umarłeś
+	3 + położenie, zasięg				bomba wybuchła
+	4 + nr mini-gry						doszliście na punkt
+	5 + byte rodzaj + byte array		wskazówka
+	6 + byte							koniec gry
 
-odpowiedzi do androida 
-cos w stylu
-
-1		ok
-0		zle ???????
-
-2 + nazwy (2 stringi z \0)			drużyny								lobby
-3 + bool drużyna + nazwa gracza		gracz dołączył do gry				lobby
-4 									wszedłeś w bombe					game
-5									umarłeś								game
-6 + położenie, zasięg				bomba wybuchła						game
-7 + nr mini-gry						doszliście na punkt					game
-8 + byte rodzaj + byte array		wskazówka							game
-9 + byte							koniec gry							game										
-czekam na propozycje
-jak na razie, to odpowiadalam stringami, ¿eby mi by³o ³atwiej ogarn¹æ xD
-
-TABELA Z BOMBAMI!!!!!!!!!
+lobby
+	101 + nazwy (2 stringi z \0)		drużyny
+	102 + bool drużyna + nazwa gracza	gracz dołączył do gry
