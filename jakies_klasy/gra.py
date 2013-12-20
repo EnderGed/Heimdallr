@@ -2,7 +2,7 @@
 
 from collections import deque
 from threading import *
-from Queue import PriorityQueue
+from queue import PriorityQueue
 import time
 
 class GameError(Exception):
@@ -34,17 +34,27 @@ class Game():
 		self.players = []
 		self.points = None
 		self.teams = []
-		self.ready_bombs = PriorityQueue()
-		self.waiting_bombs = deque()
+		
+		self.not_active_bombs = PriorityQueue()
+		self.active_bombs = deque()
+		self.exploding_bombs = deque()
 		
 	def get_phase(self): 
 		return self.phase
 		
-	def add_player(self, p):
+	#before start
+	def add_player(self, ID, team=0, bomb_limit=10, bombs_in_inventory=10, bomb_radius=100):
+		'''
+		player = add_player (ID, team, limit_bomb)
+		'''
 		if self.get_phase() != 0: raise GameError(1)
-		if p in self.players: raise GameError(3,'player exists')
+		for p in self.players: 
+			if p.ID == ID:
+				raise GameError(3,'player exists')
 		
-		self.players.append(p)
+		player = Player(ID,team,None,bomb_limit,bombs_in_inventory,bomb_radius)
+		self.players.append(player)
+		return player
 		
 	def add_team(self, teamname):
 		if self.get_phase() != 0: raise GameError(1)
@@ -93,14 +103,20 @@ class Game():
 	def start(self):
 		if self.get_phase() != 2: raise GameError(1)
 		self.phase = 3
-		#start threads
 		Exploder(self).start()
 		
 		
-	def place_bomb(self, position, blow_time, r=10):
-		self.waiting_bombs.append(Bomb(position, r, blow_time))
+		
+	#game - bombs
+	def place_bomb(self, player, position):
+		if not player.can_place_bomb():
+			return None
+		
+		bomb = Bomb(position[0], position[1], player)
+		self.not_active_bombs.append((time.time()+bomb.time_to_activate, bomb))
+		player.bombs_in_inventory -= 1
 
-
+	#simple timer for managing bombs
 	class Exploder(Thread):
 		
 		def __init__(self,game):
@@ -110,36 +126,53 @@ class Game():
 		def run(self):
 			while game.get_phase() == 3:
 				time.sleep(10)
-				bomb = game.ready_bombs.get()
-				if bomb.time < time.time():
-					#blow
-					for p in game.players:
-						if bomb.is_in_range(p):
-							p.set_alive(False)
-					self.waiting_bombs.remove(bomb)
-				else:
-					game.ready_bombs.put(bomb)
+				
+				#activate bombs
+				try:
+					time, bomb = game.not_active_bombs.get_nowait()
+					if time < time.time():
+						game.active_bombs.append(bomb)
+					else:
+						game.not_active_bombs.put_nowait((time,bomb))
+				except: pass
+				
+				#explode bombs
+				try:
+					for time, bomb in game.exploding_bombs:
+						if time < time.time():
+							for player in filter(bomb.will_explode, game.players):
+								player.set_alive(False)
+								#send info to player
+				except: pass
+					
 
 	def update_player(self,player):
 		
-		bombs_in_range = [b for b in self.waiting_bombs if b.is_in_range(player)]
-		if bombs_in_range != []:
-			#send info to player
-			for b in bombs_in_range:
-				b.time += time.time()
-				self.ready_bombs.put(b)
+		#check for bombs activated by the player
+		try:
+			for bomb in list(filter(player.is_in_range, self.active_bombs)):
+				self.active_bombs.remove(bomb)
+				self.exploding_bombs.append((time.time()+bomb.delay, bomb))
+		except: pass
+		
+		#check for bombs "in range"
+		bombs = filter(lambda b: b.will_explode(player), self.exploding_bombs)
+		
 				
 		#check if player in his current point
 		points, ctr = self.points[player.get_team()]
-		if points[ctr].is_in(player):
-			#send info
-			pass
+		if player.is_in_range(points[ctr]):
+			point = points[ctr]
+		else: point = None
+		
+		return bombs,None
 			
 	def score_point(self,player,point):
 		
 		l, ctr = self.points[player.get_team()]
 		if l[ctr] == point:
 			if ctr == len(l):
-				#game won!!!
-				pass
+				#game won
+				return (player.get_team())
 			self.points[player.get_team()] = (l,ctr+1)
+		return (player.get_team(),l[ctr].clue)
