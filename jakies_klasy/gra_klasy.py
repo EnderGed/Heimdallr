@@ -1,6 +1,6 @@
 class Player:
 	
-	def __init__(self, ID, team=0, position=None, bomb_limit=10, bombs_in_inventory=10, bomb_radius=10):
+	def __init__(self, ID, messanger, bomb_limit, bombs_in_inventory, bomb_radius, team=0, position=None):
 		self._ID = ID
 		self._position = position
 		self._team = team
@@ -8,12 +8,14 @@ class Player:
 		self.bomb_limit = bomb_limit
 		self.bombs_in_inventory = bombs_in_inventory
 		self.bomb_radius = bomb_radius
+		self._messanger = messanger
 
 	#gets
 	def get_position(self): return self._position
 	def get_ID(self): return self._ID
 	def get_team(self): return self._team
 	def is_alive(self): return self._alive
+	def get_messanger(self): return self._messanger
 		
 	#sets
 	def set_team(self, team):
@@ -24,6 +26,9 @@ class Player:
 		
 	def set_position(self, position):
 		self._position = position
+	
+	def set_messanger(self, messanger):
+		self._messanger = messanger
 
 	#info
 	def can_place_bomb(self):

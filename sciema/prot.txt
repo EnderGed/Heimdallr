@@ -15,6 +15,7 @@ lobby
 	102 + ID_gry						dolacz do gry
 	103									start gry
 	104 + boolean						zmiana/wybór drużyny
+	105 + 2*nazwa_druzyny				nazwy drużyn wybrane przez tworzącego grę
 	
 inne
 	201 + login + haslo					logowanie							
@@ -37,7 +38,12 @@ gra
 	4 + nr mini-gry						doszliście na punkt
 	5 + byte rodzaj + byte array		wskazówka
 	6 + byte							koniec gry
-
+	7 + id + jakieś dane 				jestes w grze 
+	8 + id								do gry dolaczyl
+	9 + lista(gracz, druzyna)			lista graczy
+	10 									start gry
+	
 lobby
 	101 + nazwy (2 stringi z \0)		drużyny
 	102 + bool drużyna + nazwa gracza	gracz dołączył do gry
+	103 + ID gry

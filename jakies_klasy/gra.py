@@ -4,6 +4,8 @@ from collections import deque
 from threading import *
 from queue import PriorityQueue
 import time
+from random import randint
+from gra_klasy import Player
 
 class GameError(Exception):
 	
@@ -23,7 +25,7 @@ class GameError(Exception):
 
 class Game():
 	
-	def __init__(self):
+	def __init__(self, user_id):
 		'''
 		phase - np. przed rozpoczeciem, rozpoczeta
 		players - wszyscy gracze
@@ -38,21 +40,26 @@ class Game():
 		self.not_active_bombs = PriorityQueue()
 		self.active_bombs = deque()
 		self.exploding_bombs = deque()
+		self.created_by = user_id
+		self.id = self.create_id()
 		
 	def get_phase(self): 
 		return self.phase
-		
+	
+	def create_id(size=5):
+		return str(randint(10000,99999))
+	
 	#before start
-	def add_player(self, ID, team=0, bomb_limit=10, bombs_in_inventory=10, bomb_radius=100):
+	def add_player(self, ID, messanger, team=0, bomb_limit=10, bombs_in_inventory=10, bomb_radius=100):
 		'''
 		player = add_player (ID, team, limit_bomb)
 		'''
 		if self.get_phase() != 0: raise GameError(1)
 		for p in self.players: 
-			if p.ID == ID:
+			if p.get_ID() == ID:
 				raise GameError(3,'player exists')
 		
-		player = Player(ID,team,None,bomb_limit,bombs_in_inventory,bomb_radius)
+		player = Player(ID, messanger,team,None,bomb_limit,bombs_in_inventory,bomb_radius)
 		self.players.append(player)
 		return player
 		
@@ -89,16 +96,6 @@ class Game():
 			#!!!!!actually load points to l1,l2
 		l1=l2=[]
 		self.points = {self.teams[0]: (l1,0), self.teams[1]: (l2,0)}
-		
-	def initialize_positions(self, positions):
-		'''
-		zapytac jak ma byc: lista czy po kolei, 
-		generalnie zaczekac az kazdy ma jakakolwiek pozycje
-		(moze byc bez tego, ale wtedy w start i tak sprawdze) 
-		'''
-		if self.phase != 1: raise GameError(1)
-		
-		self.phase = 2
 		
 	def start(self):
 		if self.get_phase() != 2: raise GameError(1)
