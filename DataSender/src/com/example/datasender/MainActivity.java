@@ -3,6 +3,7 @@ package com.example.datasender;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Activity;
+import android.util.Log;
 import android.view.Menu;
 import android.widget.EditText;
 
@@ -15,11 +16,13 @@ public class MainActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		Log.e("COKOLWIEK","jeszcze cokolwiek");
 		editText = (EditText) findViewById(R.id.editText1);
 		tcpClient = null;
 		cnctTask = new connectTask();
         cnctTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-        
+/*
+		Log.e("wysylam","wiadomosci");
         //teraz brzydki, tymczasowy kod
         byte[] message = new byte[1024];
         int len;
@@ -32,7 +35,7 @@ public class MainActivity extends Activity {
         	
         }
         //koniec brzydkiego kodu
-		
+		*/
 	}
 	
 	public class connectTask extends AsyncTask<String,String,TCPClient>{
@@ -49,7 +52,9 @@ public class MainActivity extends Activity {
 			});
 			
 			tcpClient.start();
-			
+			Log.e("sending","messages");
+			tcpClient.sendMessage(new byte[]{1,2,3}, 3);
+			Log.e("messages","sent");
 			return null;
 		}
 		

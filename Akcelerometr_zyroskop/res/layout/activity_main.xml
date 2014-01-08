@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:paddingTop="20dip"
+        android:text="Przyspieszenie:"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <TableLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="10dip"
+        android:stretchColumns="*" >
+
+        <TableRow>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="X-Axis"
+                android:textSize="14sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="Y-Axis"
+                android:textSize="14sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="Z-Axis"
+                android:textSize="14sp" />
+        </TableRow>
+
+        <TableRow>
+
+            <TextView
+                android:id="@+id/x_axis"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center" />
+
+            <TextView
+                android:id="@+id/y_axis"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center" />
+
+            <TextView
+                android:id="@+id/z_axis"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center" />
+        </TableRow>
+
+        <TableRow android:layout_width="match_parent" >
+
+            <RadioButton
+                android:id="@+id/zapisuj"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Zapisuj dane" />
+
+            <ToggleButton
+                android:id="@+id/start"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textOn="Działam"
+                android:textOff="Start" />
+
+            <Button
+                android:id="@+id/wykresik"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Wykres" />
+        </TableRow>
+        </TableLayout>
+        <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:paddingTop="20dip"
+        android:text="Prędkość kątowa:"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <TableLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="10dip"
+        android:stretchColumns="*" >
+
+        <TableRow>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="X-Axis"
+                android:textSize="14sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="Y-Axis"
+                android:textSize="14sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="Z-Axis"
+                android:textSize="14sp" />
+        </TableRow>
+
+        <TableRow>
+
+            <TextView
+                android:id="@+id/x_axis_zyr"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center" />
+
+            <TextView
+                android:id="@+id/y_axis_zyr"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center" />
+
+            <TextView
+                android:id="@+id/z_axis_zyr"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center" />
+        </TableRow>
+
+        <TableRow android:layout_width="match_parent" >
+
+            <RadioButton
+                android:id="@+id/zapisuj_zyr"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Zapisuj dane" />
+
+            <ToggleButton
+                android:id="@+id/start_zyr"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textOn="Działam"
+                android:textOff="Start" />
+
+            <Button
+                android:id="@+id/wykresik_zyr"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Wykres" />
+        </TableRow>
+        
+    </TableLayout>
+
+    <com.androidplot.xy.XYPlot
+        android:id="@+id/chart"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.63"
+        title="Zależność przyspieszenia od czasu" />
+
+</LinearLayout>

@@ -9,8 +9,8 @@ import java.net.Socket;
 import android.util.Log;
 
 public class TCPClient {
-	public static final int PORT = 4747;
-	public static final String IP = "127.0.0.1";	//localhost dla maszyny wirtualnej
+	public static final int PORT = 5657;
+	public static final String IP = "192.168.1.82";	//localhost dla maszyny wirtualnej
 	private static final int MSGMAXLENGTH = 40;
 	//private OnMessageReceived messageListener = null;
 	private boolean isRunning = false;
