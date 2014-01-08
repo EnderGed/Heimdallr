@@ -107,7 +107,7 @@ class Game():
 	#game - bombs
 	def place_bomb(self, player, position):
 		if not player.can_place_bomb():
-			return None
+			raise GameError(1)
 		
 		bomb = Bomb(position[0], position[1], player)
 		self.not_active_bombs.append((time.time()+bomb.time_to_activate, bomb))
@@ -144,6 +144,12 @@ class Game():
 					
 
 	def update_player(self,player):
+		'''
+		returns information for the player:
+			- BOMBS that are about to blow up and can hurt him
+			- a POINT if the player got to his next point
+			  or None if he hasn't
+		'''
 		
 		#check for bombs activated by the player
 		try:
@@ -162,9 +168,17 @@ class Game():
 			point = points[ctr]
 		else: point = None
 		
-		return bombs,None
+		return bombs,point
+		
 			
 	def score_point(self,player,point):
+		'''
+		to be called when a player solves a puzzle he got after update_player
+		input: player, 
+			   point returned by update_player
+		returns: player's team,
+				 clue on how to get to the next point for this team
+		'''
 		
 		l, ctr = self.points[player.get_team()]
 		if l[ctr] == point:

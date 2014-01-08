@@ -25,7 +25,7 @@ public class Game {
 	private int points;
 	private int level;
 	
-	private float speed;
+	private double speed;
 	private int growth;
 	private char[][] board;
 	private int hx, hy, tx, ty; //position of head and tail
@@ -34,11 +34,13 @@ public class Game {
 	
 	private Resources res;
 	private int width,height;
-	private BitmapFactory bf;
 	private BitmapFactory.Options opt;
-	private Paint text;
+	private Bitmap head,snake,item,fence;
+	private Paint text,basic = new Paint();
 	
 	private Random rand = new Random();
+	
+	
 	
 	public Game(Context c, int width, int height) {
 		this.res = c.getResources();
@@ -47,9 +49,13 @@ public class Game {
 		this.vibr = (Vibrator) c.getSystemService(Context.VIBRATOR_SERVICE);
 		text = new Paint();
 		text.setColor(Color.RED); text.setTextSize(20);
-		bf = new BitmapFactory();
 		opt = new BitmapFactory.Options();
 		opt.inDensity = 1; opt.inTargetDensity = 1;
+		
+		snake = BitmapFactory.decodeResource(res,R.drawable.body,opt);
+		item = BitmapFactory.decodeResource(res,R.drawable.item,opt);
+		head = BitmapFactory.decodeResource(res,R.drawable.head,opt);
+		fence = BitmapFactory.decodeResource(res,R.drawable.fence,opt);
 		
 		points = 0;
 		level = 0;
@@ -126,27 +132,23 @@ public class Game {
 	
 	public void draw(Canvas c) {
 
-		Bitmap snake = bf.decodeResource(res,R.drawable.body,opt);
-		Bitmap item = bf.decodeResource(res,R.drawable.item,opt);
-		Bitmap head = bf.decodeResource(res,R.drawable.head,opt);
-		Bitmap fence = bf.decodeResource(res,R.drawable.fence,opt);
 		c.drawColor(Color.BLACK);
 		for (int i=0; i<width; i++) {
 			for (int j=0; j<height; j++) {
 				if (i == hx && j == hy) {
-					c.drawBitmap(head, i*tileSize, j*tileSize, new Paint());
+					c.drawBitmap(head, i*tileSize, j*tileSize, basic);
 					continue;
 				}
 				if (board[i][j]=='-') {
-					c.drawBitmap(snake, i*tileSize, j*tileSize, new Paint());
+					c.drawBitmap(snake, i*tileSize, j*tileSize, basic);
 					continue;
 				}
 				if (board[i][j]=='*') {
-					c.drawBitmap(item, i*tileSize, j*tileSize, new Paint());
+					c.drawBitmap(item, i*tileSize, j*tileSize, basic);
 					continue;
 				}
 				if (board[i][j]=='#') {
-					c.drawBitmap(fence, i*tileSize, j*tileSize, new Paint());
+					c.drawBitmap(fence, i*tileSize, j*tileSize, basic);
 					continue;
 				}
 			}
@@ -245,4 +247,6 @@ public class Game {
 	private int mod(int n, int m) {
 		return (n < 0) ? (m - (Math.abs(n)%m) )%m:(n%m);
 	}
+	
+	public void setSpeed(double s) {speed = s;}
 }

@@ -18,6 +18,11 @@ public class Panel extends SurfaceView implements Callback, SensorEventListener 
 	private Context c;
 	private SensorManager sm;
 	
+	private double vx,vy,vz;
+	private double delay = 500;
+	private double alpha = 0.8;
+	
+	
 	public Panel(Context context) {
 		super(context);
 		
@@ -26,7 +31,8 @@ public class Panel extends SurfaceView implements Callback, SensorEventListener 
 		getHolder().addCallback(this);
 		
 		sm = (SensorManager) c.getSystemService(Context.SENSOR_SERVICE);
-		sm.registerListener(this,sm.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),SensorManager.SENSOR_DELAY_GAME);
+		sm.registerListener(this,sm.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),500);
+		vx = vy = vz = 0;
 	}
 	
 	@Override
@@ -68,13 +74,29 @@ public class Panel extends SurfaceView implements Callback, SensorEventListener 
 	@Override
 	public void onAccuracyChanged(Sensor arg0, int arg1) {
 		// TODO Auto-generated method stub
-		System.err.println("???");
 	}
 
+	
+	double[] gravity = new double[3];
+	double accx,accy,accz;
+	double a = 1., b = 0.;
 	@Override
 	public void onSensorChanged(SensorEvent evt) {
-		System.err.println("???");
 		
+		
+		gravity[0] = alpha * gravity[0] + (1 - alpha) * evt.values[0];
+        gravity[1] = alpha * gravity[1] + (1 - alpha) * evt.values[1];
+        gravity[2] = alpha * gravity[2] + (1 - alpha) * evt.values[2];
+
+        accx = evt.values[0] - gravity[0];
+        accy = evt.values[1] - gravity[1];
+        accz = evt.values[2] - gravity[2];
+        
+        vx += accx * delay;
+        vy += accy * delay;
+        vz += accz * delay;
+
+        game.setSpeed(a * Math.sqrt(vx*vx + vy*vy + vz*vz) + b);
 	}
 
 }
