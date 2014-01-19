@@ -38,7 +38,7 @@ public class Game {
 	private Bitmap head,snake,item,fence;
 	private Paint text,basic = new Paint();
 	
-	private Random rand = new Random();
+	public Random rand = new Random();
 	
 	
 	
@@ -124,6 +124,8 @@ public class Game {
 			if (!processNextField(hx, hy))
 				return false;
 			
+			//speed -= 2;
+			debug = Double.toString(speed);
 			processRandomEvents();
 			
 		}
@@ -154,7 +156,9 @@ public class Game {
 			}
 		}
 		c.drawText("points: "+Integer.toString(points), width*tileSize-100, 15, text);
+		c.drawText(debug, width*tileSize-150, 50, text);
 	}
+	private String debug = "debug";
 	
 	private void initBoard() {
 		
@@ -220,9 +224,9 @@ public class Game {
 	 */
 	private void processRandomEvents() {
 		
-		if (rand.nextFloat() < 0.01) vibr.vibrate(5000);
+		//if (rand.nextFloat() < 0.01) vibr.vibrate(5000);
 		
-		if (rand.nextFloat() < 0.01) speed += 0.2;
+		//if (rand.nextFloat() < 0.05) speed = 0;
 		
 		/*if (rand.nextFloat() < 0.05) {
 			int tmp = hx; hx = tx; tx = tmp;
@@ -248,5 +252,7 @@ public class Game {
 		return (n < 0) ? (m - (Math.abs(n)%m) )%m:(n%m);
 	}
 	
-	public void setSpeed(double s) {speed = s;}
+	public void setSpeed(double s) {
+		speed = s;
+	}
 }

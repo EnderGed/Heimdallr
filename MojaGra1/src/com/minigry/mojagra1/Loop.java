@@ -5,7 +5,7 @@ import android.view.SurfaceHolder;
 
 public class Loop extends Thread {
 
-	private static int sleepTime = 60; 
+	private static int sleepTime = 100; 
 	
 	private SurfaceHolder holder;
 	private Game game;
