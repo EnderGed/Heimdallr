@@ -9,17 +9,19 @@ import java.net.Socket;
 import android.util.Log;
 
 public class TCPClient {
-	public static final int PORT = 5657;
-	public static final String IP = "192.168.1.82";	//localhost dla maszyny wirtualnej
-	private static final int MSGMAXLENGTH = 40;
+	public static final int PORT = 8074;
+	public static final String IP = "192.168.1.82";
+	private static final int MSGMAXLENGTH = 100;
 	//private OnMessageReceived messageListener = null;
 	private boolean isRunning = false;
 	private InputStream in = null;
 	private OutputStream out = null;
 	private onMessageRecieved omr = null;
+	private onConnectionLost ocl = null;
 	
-	public TCPClient(onMessageRecieved omr){
+	public TCPClient(onMessageRecieved omr, onConnectionLost ocl){
 		this.omr = omr;
+		this.ocl = ocl;
 	}
 	
 	public void start(){
@@ -28,7 +30,9 @@ public class TCPClient {
 		int bytesRead = 0;
 		try{
 			InetAddress serverAddr = InetAddress.getByName(IP);
+			Log.e("connecting","before obtaining socket");
 			Socket socket = new Socket(serverAddr, PORT);
+			Log.e("connecting","socket obtained");
 			try{
 				in = socket.getInputStream();
 				out = socket.getOutputStream();
@@ -38,11 +42,13 @@ public class TCPClient {
 						omr.messageRecieved(msg, bytesRead);
 				}
 			} catch(Exception e){
+				ocl.connectionLost();
 				Log.e("TCPClient","Error", e);
 			} finally{
 				socket.close();
 			}
 		} catch(Exception e){
+			ocl.connectionLost();
 			Log.e("TCPClient","Error", e);
 		}
 	}
@@ -62,5 +68,9 @@ public class TCPClient {
 
 	public interface onMessageRecieved{
 		public void messageRecieved(byte[] message, int len);
+	}
+	
+	public interface onConnectionLost{
+		public void connectionLost();
 	}
 }

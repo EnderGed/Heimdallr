@@ -4,5 +4,6 @@
     <string name="app_name">DataSender</string>
     <string name="action_settings">Settings</string>
     <string name="hello_world">Hello world!</string>
+    <string name="location">location</string>
 
 </resources>

@@ -8,12 +8,44 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".MainActivity" >
 
-    <EditText
-        android:id="@+id/editText1"
+    <Button
+        android:id="@+id/b_location"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginRight="102dp"
-        android:layout_marginTop="64dp"
-        android:ems="10" />
+        android:layout_alignBottom="@+id/button_send"
+        android:layout_toRightOf="@+id/button_send"
+        android:text="@string/location" />
+
+    <TextView
+        android:id="@+id/textView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="21dp"
+        android:text="TextView" />
+
+    <com.example.datasender.MapView
+        android:id="@+id/mapView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/textView1"
+        android:layout_below="@+id/textView1" />
+
+    <Button
+        android:id="@+id/bBomb"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/b_location"
+        android:layout_alignRight="@+id/mapView1"
+        android:text="Bomb" />
+
+    <Button
+        android:id="@+id/button_send"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/mapView1"
+        android:layout_toRightOf="@+id/textView1"
+        android:text="send" />
 
 </RelativeLayout>
