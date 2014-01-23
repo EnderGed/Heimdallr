@@ -10,7 +10,7 @@ import re
 from Crypto.Hash import SHA256
 from protocol import *
 from user import User
-import gra
+from gra import *
 from gra_klasy import Player
 
 e_mail = re.compile(r"[^@]+@[^@]+\.[^@]+")
@@ -387,22 +387,12 @@ class Server:
 		222 - user is not in the game or does not created this game
 		'''
 		if team == '5':
-			if user.get_game() = None or user.get_game().created_by != user.get_login():
-				raise ServerError(222, msg)
-			g = user.get_game()
-		self.send_to_everybody(g, 4, team)
-		for p in g.players:
-			p.set_game(None)
 			try:
-				sql_rmv_from_game(user.get_login())
+				if user.get_game() !=  None:
+					sql_rmv_game(g.id)
 			except:
-				print("sql error - end game")
+				print("sql error 2 - end game")
 				raise ServerError(121, msg)
-		try:
-			sql_rmv_game(g.id)
-		except:
-			print("sql error 2 - end game")
-			raise ServerError(121, msg)
 		self.rm_add_game(g, True)
 		print("Koniec gry")
 	
@@ -449,7 +439,7 @@ class Server:
 		'''
 		
 		if user.get_login() == None:
-			rause ServerError(222, msg)
+			raise ServerError(222, msg)
 			
 		print("no to sie wyloguj.")
 		try:
