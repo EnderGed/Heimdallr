@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/popup_wrong_login" 
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#ffffff"
+    android:padding="10sp" >
+    
+<TextView 
+android:id="@+id/txtView_wrong_login" 
+android:layout_width="wrap_content" 
+android:layout_height="wrap_content" 
+android:layout_marginTop="65px" 
+android:layout_marginLeft="90px" 
+android:text="Nieprawidłowy login lub hasło." />
+
+<Button 
+android:id="@+id/btn_close_popup_wrong_login" 
+android:layout_width="wrap_content" 
+android:layout_height="wrap_content" 
+android:layout_marginTop="15px" 
+android:layout_gravity="center" 
+android:text="OK" />
+
+<EditText
+    android:id="@+id/editText1_wrong_login"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:ems="10"
+    android:hint="email"
+    android:inputType="textEmailAddress" >
+
+    <requestFocus />
+</EditText>
+
+<Button 
+android:id="@+id/btn_new_password" 
+android:layout_width="wrap_content" 
+android:layout_height="wrap_content" 
+android:layout_marginTop="15px" 
+android:layout_gravity="center" 
+android:text="nowe hasło" /> 
+</LinearLayout>
