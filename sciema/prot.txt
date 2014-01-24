@@ -4,21 +4,20 @@ maksymalny rozmiar komunikatu 1024 bajtów? więcej?
 użytkownik -> serwer
 
 gra
-	1 + polozenie						polozenie
-	2 + polozenie						bomba
+	1 + polozenie						polozenie		double dlugosc, double szerokosc
+	2 + polozenie						bomba			-||-
 	3									wyjscie z rozgrywki
 	4 									zakonczenie gry
-	5 + bool zaliczone					mini-gra skończona
+	5 + bool zaliczone					mini-gra skończona 	byte: 0 / 1
 	
 lobby
-	101 								stworz gre
-	102 + ID_gry						dolacz do gry
+	101 + 2*nazwa_druzyny				stworz gre		dwa stringi zakonczone \0
+	102 + ID_gry						dolacz do gry		int
 	103									start gry
 	104 + boolean						zmiana/wybór drużyny
-	105 + 2*nazwa_druzyny				nazwy drużyn wybrane przez tworzącego grę
 	
 inne
-	201 + login + haslo					logowanie							
+	201 + login + haslo					logowanie		dwa stringi zakonczone \0					
 	202									wylogowanie
 	203 + login + adres					rejestracja
 	204 + login + sare_haslo nowe_haslo	zmiana hasla????
@@ -34,16 +33,18 @@ zwykłe odpowiedzi
 gra
 	1 									wszedłeś w bombe
 	2									umarłeś
-	3 + położenie, zasięg				bomba wybuchła
-	4 + nr mini-gry						doszliście na punkt
+	3 + położenie, zasięg				bomba wybuchła			3* double
+	4 + nr mini-gry						doszliście na punkt		int
 	5 + byte rodzaj + byte array		wskazówka
+			byte rodzaj: 1 - String, 2 - obrazek (png)
 	6 + byte							koniec gry
-	7 + id + jakieś dane 				jestes w grze 
-	8 + id								do gry dolaczyl
-	9 + lista(gracz, druzyna)			lista graczy
+			1 - zwyciestwo 2 - porazka 3 - koniec
+	7 + id + jakieś dane 				jestes w grze 	//na razie nie
+	8 + id								do gry dolaczyl	//na razie nie
 	10 									start gry
 	
 lobby
 	101 + nazwy (2 stringi z \0)		drużyny
 	102 + bool drużyna + nazwa gracza	gracz dołączył do gry
-	103 + ID gry
+	103 + ID gry						stworzono rozgrywke
+	109 + lista(gracz, druzyna)			lista graczy  string, bool
