@@ -60,7 +60,7 @@ class ObjectOnMap:
 		
 class Point(ObjectOnMap):
 	
-	def __init__(self, x, y, clue):
+	def __init__(self, x, y, r, clue):
 		ObjectOnMap.__init__(self, x, y, r)
 		self.clue = clue
 
