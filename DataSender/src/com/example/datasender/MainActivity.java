@@ -11,6 +11,7 @@ import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.PopupWindow;
 import android.widget.Toast;
 
@@ -48,7 +49,7 @@ public class MainActivity extends Activity {
 		});
         
         //klawisz do stawiania bomb
-        Button placeBomb = (Button)findViewById(R.id.bBomb);
+        ImageButton placeBomb = (ImageButton)findViewById(R.id.bBomb);
         placeBomb.setOnClickListener(new View.OnClickListener(){
         	@Override
         	public void onClick(View v){

@@ -37,7 +37,7 @@ public class MapView extends SurfaceView{
     public MapView(Context context, AttributeSet attrs) {
         super(context, attrs);
         android.util.Log.e("MapView","created");
-        map = BitmapFactory.decodeResource(getResources(), R.drawable.granade);
+        map = BitmapFactory.decodeResource(getResources(), R.drawable.map);
         this.setWillNotDraw(false);
         mapHeight = map.getHeight();
         mapWidth = map.getWidth();
