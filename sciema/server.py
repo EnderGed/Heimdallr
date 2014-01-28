@@ -12,6 +12,8 @@ from protocol import *
 from user import User
 from gra import *
 from gra_klasy import Player
+import sys
+from struct import pack
 
 e_mail = re.compile(r"[^@]+@[^@]+\.[^@]+")
 
@@ -29,8 +31,7 @@ sql_address = db.prepare("SELECT * FROM users WHERE e_mail LIKE $1")
 sql_check_login = db.prepare("SELECT * FROM users WHERE login LIKE $1 AND pass LIKE $2")
 sql_update_pass = db.prepare("UPDATE users SET pass = $1 WHERE login LIKE $2")
 sql_find_login = db.prepare("SELECT login FROM users WHERE e_mail LIKE $1")
-sql_registration1 = db.prepare("INSERT INTO users VALUES ($1, $2, $3)")
-sql_registration2 = db.prepare("INSERT INTO bombs(login) VALUES ($1)")
+sql_registration1 = db.prepare("INSERT INTO users(login,pass,e_mail) VALUES ($1, $2, $3)")
 sql_bomb = db.prepare("SELECT bomb_limit, bombs_in_inventory, bomb_radius FROM bombs WHERE login LIKE $1")
 sql_in_game = db.prepare("SELECT login FROM in_game WHERE login LIKE $1 AND connected = TRUE")
 sql_add_to_game = db.prepare("UPDATE in_game SET connected = TRUE WHERE login LIKE $1")
@@ -38,9 +39,12 @@ sql_rmv_from_game = db.prepare("UPDATE in_game SET connected = FALSE WHERE login
 sql_logout = db.prepare("DELETE FROM in_game WHERE login LIKE $1")
 sql_new_player = db.prepare("INSERT INTO in_game VALUES ($1)")
 sql_add_game = db.prepare("UPDATE in_game SET game = $1 WHERE login LIKE $2")
-sql_rmv_game = db.prepare("UPDATE in_game SET game = NULL WHERE login LIKE $1")
+sql_set_game_null = db.prepare("UPDATE in_game SET game = NULL WHERE login LIKE $1")
 sql_new_game = db.prepare("INSERT INTO games VALUES($1, $2)")
 sql_rmv_game = db.prepare("DELETE FROM games WHERE ID = $1")
+sql_pass_temp = db.prepare("SELECT * FROM users WHERE login = $1 AND pass_temp = TRUE")
+sql_set_temp_pass1 = db.prepare("UPDATE users SET pass_temp = FALSE WHERE login = $1")
+sql_set_temp_pass2 = db.prepare("UPDATE users SET pass_temp = TRUE WHERE login = $1")
 
 def password_gen(size=8, chars=string.ascii_uppercase + string.digits):
 	return ''.join(random.choice(chars) for x in range(size))
@@ -53,7 +57,7 @@ class Doorkeeper(threading.Thread):
 	def __init__(self, server):
 		threading.Thread.__init__(self)
 		self.server = server
-		
+	
 	def run(self):
 		while True:
 			if len(self.server.get_users()) < self.server.max_users:
@@ -62,7 +66,7 @@ class Doorkeeper(threading.Thread):
 					self.server.new_user(conn)
 				except OSError:
 					print("nie udalo sie")
-					return
+					sys.exit()
 		
 class Server:
 	'''
@@ -122,6 +126,7 @@ class Server:
 			self.s = socket(AF_INET, SOCK_STREAM) 
 			self.s.bind((self.HOST,self.PORT)) 
 			self.s.listen(5)
+			print('Server started')
 		except OSError:
 			return
 	
@@ -170,8 +175,7 @@ class Server:
 		password = password_gen()
 		hash = self._get_hash(password)
 		try:
-			sql_registration1(login, hash,address)
-			sql_registration2(login)
+			sql_registration1(login, hash, address)
 		except:
 			raise ServerError(200, msg)
 		self._send_mail(registration_mail, login, address, password)
@@ -213,6 +217,9 @@ class Server:
 		print("Logowanie")
 		user.get_messanger().answer_user(201, msg)
 		[game,player] = self.disscon(login)
+		if (sql_pass_temp(login) != []):
+			print("Ktos nowy sie pojawil  :)")
+			user.get_messanger().answer_user(202)
 		if(game != None):
 			print("jest w grze")
 			try:
@@ -233,7 +240,7 @@ class Server:
 			print("nie jest w grze")
 			#czy tez trzeba cos wyslac??
 	
-	def create_game(self, user, msg = chr(101)):
+	def create_game(self, user, teams, msg = chr(101)):
 		'''
 		This function create game
 		Arguments:
@@ -252,17 +259,21 @@ class Server:
 		if len(self.get_games()) >= self.max_games:
 			print("nie ma miejsca w gospodzie")
 			raise ServerError(200, msg)
-		if user.get_game() != None:
-			print("Juz masz gre!")
+		if user.get_login()==None or user.get_game() != None:
+			print("Nie mozesz stworzyc gry!")
 			raise ServerError(222, msg)
 			
-		g = gra.Game(user.get_login())
-		user.get_messanger().answer_user(103, g.id)
+		g = Game(user.get_login(), teams)
+		id = tuple(pack("!I", g.id))
 		try:
 			sql_new_game(user.get_login(), g.id)
 		except:
 			print("sql error -create game")
-			raise ServerError(121, msg)
+			raise ServerError(222, msg)
+		msg = ''
+		for i in id:
+			msg = msg + chr(i)
+		user.get_messanger().answer_user(103, msg)
 		self.rm_add_game(g, False)
 		self.join_game(g.id, user)
 		print("Stworzona gra")
@@ -281,16 +292,16 @@ class Server:
 			
 		possible errors:
 		200 - there is not enought players or teams
-		222 - game has already started
+		222 - game cannot be startes
 		223 - some players ane not ready yet
 		'''
-		if user.get_game().created_by != user.get_login():
+		if user.get_game() == None or user.get_game().created_by != user.get_login():
 			raise ServerError(222, msg)
 		#to tylko tak teraz, potem bedzie prawdziwy plik!!!
 		file = None
 		try:
 			user.get_game().load_points(file)
-		except gra.GameError as e:
+		except GameError as e:
 			print(e.code)
 			if e == 1:
 				raise ServerError(222, msg)
@@ -301,9 +312,9 @@ class Server:
 				raise ServerError(223, msg)
 		try:
 			user.get_game().start()
-		except gra.GameError:
+		except GameError:
 			raise ServerError(222, msg)
-		send_to_everybody(10)
+		send_to_everybody(user.get_game(), 10)
 	
 	def send_to_everybody(self, game, nr, msg = ''):
 		#do wszystkich w grze
@@ -315,11 +326,21 @@ class Server:
 			if p.get_team() == team:
 				p.get_messanger().answer_user(nr, msg)
 
+	def send_teams(self, user):
+		msg = user.get_game().teams
+		msg = msg[0] + chr(0) + msg[1] + chr(0)
+		user.get_messanger().answer_user(110, msg)
+				
 	def list_of_players(self, game, user):
 		msg = ''
+		teams = game.teams
 		for p in game.players:
-			msg = msg + p.get_ID + ' '
-		user.get_messanger().answer_user(9, msg)
+			msg = msg + p.get_ID() + chr(0)
+			if p.get_team() == teams[0]:
+				msg = msg + chr(0)
+			else:
+				msg = msg + chr(1)
+		user.get_messanger().answer_user(109, msg)
 	
 	def join_game(self, id, user, msg = chr(102)):
 		'''
@@ -352,13 +373,13 @@ class Server:
 		for g in self.get_games():
 			if g.id == id:
 				try:
-					g.add_player(user.get_login(), user.get_messanger(), bomb[0][0], bomb[0][1], bomb[0][2])
+					g.add_player(user.get_login(), user.get_messanger(), bomb[0][0], bomb[0][1], bomb[0][2], g.teams[0])
 					try:
 						sql_add_game(g.created_by, user.get_login())
 					except:
 						print("sql error - 2 - join game")
 						raise ServerError(121, msg)
-				except gra.GameError as e:
+				except GameError as e:
 					if e.code == 1:
 						raise ServerError(222, msg)
 						print("Nie mozesz teraz dolaczyc do gry")
@@ -366,16 +387,19 @@ class Server:
 						raise ServerError(200, msg)
 				user.set_game(g)
 				user.get_messanger().answer_user(201, msg)
+				self.send_teams(user)
+				self.list_of_players(g, user)
+				self.send_to_everybody(user.get_game(), 102, chr(0)+user.get_login())
 				return
 		print("nie ma takiej gry")
 		raise ServerError(200, msg)
 	
-	def end_game(self, user, team='5', msg = chr(4)):
+	def end_game(self, user, team=3, msg = chr(4)):
 		'''
 		This function ends game
 		Arguments:
 		user - object of class User
-		team - name of team or '5' when game is ended by player
+		team - name of team or '3' when game is ended by player
 		msg - it is a message, which will be send to user after start of the game
 		(it will be also send in case function has failed)
 			
@@ -386,13 +410,25 @@ class Server:
 		121 - database exception
 		222 - user is not in the game or does not created this game
 		'''
-		if team == '5':
+		#zlap wyjatek jak nie jest 
+		g = user.get_game()
+		if team == 3:
+			if g == None or g.created_by != user.get_login():
+				raise ServerError(222, msg)
+				print("nie jestes w grze")
 			try:
-				if user.get_game() !=  None:
-					sql_rmv_game(g.id)
+				sql_rmv_game(g.id)
 			except:
 				print("sql error 2 - end game")
 				raise ServerError(121, msg)
+		else:
+			teams = user.get_game().teams
+			if teams[0] == team:
+				send_to_team(g, team, 4, chr(1))
+				send_to_team(g, teams[1], 4, chr(1))
+			else:
+				send_to_team(g, team, 4, chr(1))
+				send_to_team(g, teams[0], 4, chr(1))
 		self.rm_add_game(g, True)
 		print("Koniec gry")
 	
@@ -410,9 +446,11 @@ class Server:
 				sql_logout(user.get_login())
 			except:
 				print("sql error - 2 - connection lost")
-				#raise ServerError(121)
-		self.rm_add_user(user, True)
-		print("dddd1111")
+				#raise ServerError(121
+		try:
+			self.rm_add_user(user, True)
+		except:
+			pass
 
 	def disscon(self, login):
 		for g in self.get_games():
@@ -462,8 +500,7 @@ class Server:
 			#to pewnie nie zadziala xD
 			conn.send(222)
 			return
-		user = User(self, conn, self.prot)
-		self.get_users().append(user)
+		self.rm_add_user(User(self, conn, self.prot), False)
 	
 	def change_pass(self, login, old_pass, new_pass, user, msg = chr(204)):
 		'''
@@ -483,6 +520,8 @@ class Server:
 		121 - database exception
 		200 - login or/and old password is wrong
 		'''
+		old_pass = self._get_hash(old_pass)
+		new_pass = self._get_hash(new_pass)
 		print("zmiana hasla")
 		try:
 			sql = sql_check_login(login,old_pass)
@@ -497,6 +536,7 @@ class Server:
 		except:
 			print("sql error- 2 - change pass")
 			raise ServerError(121, msg)
+		sql_set_temp_pass1(login)
 		user.get_messanger().answer_user(201, msg)
 
 	def end(self, user):
@@ -505,11 +545,9 @@ class Server:
 		'''
 		print("do zobaczenia")
 		user.geisha.connection = False
-		print(len(self.get_users()))
-		self.rm_user(user)
-		print(len(self.get_users()))
+		self.rm_add_user(user)
 		
-	def new_pass_login(self, address, user, msg = 205):
+	def new_pass_login(self, address, user, msg = chr(205)):
 		'''
 		This function send on users e-mail new password and his login
 		Arguments:
@@ -549,9 +587,10 @@ class Server:
 			raise ServerError(121, msg)
 		adres = address
 		self._send_mail(change_pass_mail, login[0][0], adres, password)
+		sql_set_temp_pass2(login[0][0])
 		user.get_messanger().answer_user(201, msg)
 	
-	def location(self, loc, user, msg = chr(1)):
+	def location(self, position, user, msg = chr(1)):
 		'''
 		This function check current location of the user
 		Arguments:
@@ -564,10 +603,16 @@ class Server:
 		'''
 		if user.get_game() == None or user.get_game.phase < 3:
 			raise ServerError(222, msg)
-		user.get_player().set_position(loc)
-		cos = user.get_game().update_player(user.get_player())
+		user.get_player().set_position(position)
+		bombs, point = user.get_game().update_player(user.get_player())
 		
-		#cos z tym cosiem trzeba zrobic
+		#zapytac jak rozroznic, czy bomba wybucha wlasnie, co przeslac w point + przeslanie komunikatu do osoby, ktora
+		# postawila bombe, ze wybuchla
+		for bomb in bombs:
+			user.get_messanger().answer_user(1, msg)
+		if point != None:
+			#przeslanie point do Marty
+			user.get_messanger().answer_user(201, msg)
 		
 	def set_team_names(self, team_1, team_2, user, msg=chr(105)):
 		'''
@@ -585,12 +630,12 @@ class Server:
 		200 - it is not possible to add new team in this moment
 		222 - user is not in game, it is not his game or team already exists
 		'''
-		if user.get_name() == None or user.get_game().created_by != user.get_login():
+		if user.get_login == None or user.get_game() == None or user.get_game().created_by != user.get_login():
 			raise ServerError(222, msg)
 		try:
 			user.get_game().add_team(team_1)
 			user.get_game().add_team(team_2)
-		except gra.GameError as e:
+		except GameError as e:
 			if e.code < 3:
 				raise ServerError(222, msg)
 			else:
@@ -612,15 +657,19 @@ class Server:
 			201
 			
 		possible errors:
-		200 - team does not exists or user is not in game
+		222 - team does not exists or user is not in game
+		200 - team cannot be change
 		'''
 		# w jakiej formie przyjdzie i jak jest przechowywane !!!
-		if user.get_game == None:
-			raise ServerError(200, msg)
+		if user.get_login() == None or user.get_game == None:
+			raise ServerError(222, msg)
 		try:
-			user.get_game().assign(user.get_player(), team)
-		except gra.GameError:
+			user.get_game().assign(user.get_player(), user.get_game().teams[team])
+		except GameError:
 			raise ServerError(200, msg)
+		user.get_messanger().answer_user(201, msg)
+		msg = chr(team)+user.get_login()
+		send_to_everybody(user.get_game(), 104, msg)
 	
 	def solution_puzzle(self, solution, user, msg=chr(5)):
 		'''
@@ -649,9 +698,9 @@ class Server:
 		#co to jest point?
 		clue = user.get_game().score_point(user.get_player(), point)
 		if len(clue) == 1:
-			end_game(user, clue[0])
+			end_game(user, user.get_player().get_team(), clue[0])
 		else:
-			send_to_team(user.get_game(), clue[0], 5, clue[1])
+			send_to_team(user.get_game(), user.get_player().get_team(), clue[0], 5, clue[1])
 	
 	def bomb(self, bomb_to_place, user, msg=chr(2)):
 		'''
@@ -669,6 +718,7 @@ class Server:
 		200 - it is not possible to place bomb in this moment
 		222 - user is not in game or game has not started yet
 		'''
+		print(user)
 		if user.get_game() == None or user.get_game().phase < 3:
 			raise ServerError(222, msg)
 		try:
@@ -677,7 +727,7 @@ class Server:
 			raise ServerError(200, msg)
 		user.get_messanger().answer_user(201, msg)
 			
-	def disconnect_user(self, user, msg = 3):
+	def disconnect_user(self, user, msg = chr(3)):
 		'''
 		User don't want to play in game any longer
 		Arguments:
@@ -697,13 +747,26 @@ class Server:
 			print("nie jestes w grze")
 		print("Odlaczenie gracza")
 		try:
-			sql_rmv_game(user.get_login())
+			sql_set_game_null(user.get_login())
 		except:
 			print("sql error - disconnect user from game")
 			raise ServerError(121, msg)
 		user.get_game().delete_player(user.get_player())
 		user.set_game(None)
 		user.get_messanger().answer_user(201, msg)
+		
+	def stop(self):
+		self.s.close()
+
+def ending(s):
+	while True:
+		try:
+			time.sleep(100)
+		except:
+			print ("bye bye")
+			s.stop()
+			db.close()
+			return
 			
 if __name__ == "__main__":
-	Server()
+	ending(Server())

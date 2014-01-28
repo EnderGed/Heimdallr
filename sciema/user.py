@@ -11,7 +11,7 @@ class User:
 		self._login = None
 		self._player = None
 		self._geisha.start()
-		
+	
 	def connection_lost(self):
 		if self.get_player() != None:
 			self.get_player().set_messanger(None)
@@ -49,7 +49,6 @@ class Geisha(threading.Thread):
 					print("zakonczono polaczenie")
 					self._user.connection_lost()
 				else:
-					print("dd")
 					self._prot.messages(message, self._user)
 			except ConnectionError:
 				print("polaczenie przerwano")
@@ -67,7 +66,7 @@ class Messanger:
 		msg.append(nr)
 		for i in message:
 			msg.append(ord(i))
-		print('huehuehue')
+		print('nr: ' + str(nr))
 		self.answer(msg)
 			
 	def answer(self, message):

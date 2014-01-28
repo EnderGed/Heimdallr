@@ -25,9 +25,7 @@ class GameError(Exception):
 
 class Game():
 	
-	directory = 'point_data/'
-	
-	def __init__(self, user_id):
+	def __init__(self, user_id, teams):
 		'''
 		phase - np. przed rozpoczeciem, rozpoczeta
 		players - wszyscy gracze
@@ -37,7 +35,7 @@ class Game():
 		self.phase = 0
 		self.players = []
 		self.points = None
-		self.teams = []
+		self.teams = teams
 		
 		self.not_active_bombs = PriorityQueue()
 		self.active_bombs = deque()
@@ -49,7 +47,7 @@ class Game():
 		return self.phase
 	
 	def create_id(size=5):
-		return str(randint(10000,99999))
+		return randint(10000,99999)
 	
 	#before start
 	def add_player(self, ID, messanger, team=0, bomb_limit=10, bombs_in_inventory=10, bomb_radius=100):
@@ -95,9 +93,12 @@ class Game():
 		self.phase = 1
 		self.players = tuple(self.players)
 		
-		l1 = get_points(directory+'pointsA.csv')
-		l1 = get_points(directory+'pointsB.csv')
+			#!!!!!actually load points to l1,l2
+		l1=l2=[]
 		self.points = {self.teams[0]: (l1,0), self.teams[1]: (l2,0)}
+		
+		# to ja dopisalam - Ola
+		self.phase = 2
 		
 	def start(self):
 		if self.get_phase() != 2: raise GameError(1)
@@ -189,26 +190,3 @@ class Game():
 				return (player.get_team())
 			self.points[player.get_team()] = (l,ctr+1)
 		return (player.get_team(),l[ctr].clue)
-		
-	def get_points(csv):
-		points = []
-		with open(csv,"r") as f:
-			f.readline()
-			f.readline()
-			l = f.readline()
-			while l:
-				parts = list(map(lambda x: x.strip(), l.split(';')))
-				try:
-					tp = int(parts[3])
-					if tp == 1: clue = (tp,parts[4])
-					elif tp == 2:
-						c = open(directory+parts[4],'rb')
-						clue = (tp,c.read())
-						c.close()
-					else:
-						l = f.radline()
-						continue
-					points.append(Point(float(parts[0]), float(parts[1]), float(parts[2]), clue))
-				except: pass
-				finally: l = f.readline()
-		return points

@@ -27,9 +27,13 @@ inne
 serwer -> użytkownik
 
 zwykłe odpowiedzi
-	201		ok
-	200		zle
+	201	+ nr polecenia				ok
+	200	+ nr polecenia				zle
+	222	+ nr polecenia				serwer nie może wykonać tego polecenia
+	121	+ nr polecenia				problem z baza danych
 
+	202		zmien haslo	(po wyslaniu wiadomosci na maila - rejestracja, zapomniane haslo)
+	
 gra
 	1 									wszedłeś w bombe
 	2									umarłeś
@@ -47,4 +51,7 @@ lobby
 	101 + nazwy (2 stringi z \0)		drużyny
 	102 + bool drużyna + nazwa gracza	gracz dołączył do gry
 	103 + ID gry						stworzono rozgrywke
+	104 + bool drużyna + nazwa gracza	gracz zmienil druzyne
+	108 + id							do gry dolaczyl
 	109 + lista(gracz, druzyna)			lista graczy  string, bool
+	110 + druzyny						dwa stringi zakonczone \0
