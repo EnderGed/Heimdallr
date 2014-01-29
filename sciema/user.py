@@ -68,6 +68,7 @@ class Messanger:
 		try:
 			msg = bytearray()
 			msg.append(nr)
+			msg.append(0)
 			for i in message:
 				msg.append(ord(i))
 			print('nr: ' + str(nr))

@@ -76,7 +76,7 @@ class Server:
 	def __init__(self):
 		self.lock = threading.RLock()
 		self.HOST = ''
-		self.PORT = 5657
+		self.PORT = 64480
 		self._users = []
 		self._games = []
 		self._discon = []
@@ -769,7 +769,15 @@ class Server:
 		except GameError as e:
 			raise ServerError(200, msg)
 		user.get_messanger().answer_user(201, msg)
-			
+		
+	def out_of_lobby(self, from_user):
+		if user.get_game() != None:
+			if user.get_login() == user.get_game.created_by:
+				self.end_game(self, user, team=3, msg = chr(4))
+			else:
+				self.disconnect_user(user)
+				send_to_everyody(user.get_game(), 111)
+		
 	def disconnect_user(self, user, msg = chr(3)):
 		'''
 		User don't want to play in game any longer

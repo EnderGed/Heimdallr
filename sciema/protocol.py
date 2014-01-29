@@ -47,6 +47,7 @@ class Protocol:
 				game_id = None
 				try:
 					game_id = unpack('>I', w[1:5:1])[0]
+					print(game_id)
 				except:
 					from_user.get_messanger().answer_user(255)
 				self.server.join_game(game_id, from_user)
@@ -55,16 +56,14 @@ class Protocol:
 			elif order == 104:
 				self.server.change_team(int(w[1]), from_user)
 			elif order == 105:
-				message = ''
-				for i in w[1::]:
-					message = message + chr(i)
-				message = message.split(chr(0))
-				self.server.set_team_names(message[0], message[1], from_user)
+				self.server.out_of_lobby(from_user)
 			elif order == 201:
 				message = ''
 				for i in w[1::]:
 					message = message + chr(i)
+					print(i)
 				message = message.split(chr(0))
+				print(message)
 				self.server.login(message[0], message[1], from_user)
 			elif order == 202:
 				self.server.log_out(from_user)
