@@ -9,7 +9,7 @@ import string
 import re
 from Crypto.Hash import SHA256
 from protocol import *
-from user import User
+from user import *
 from gra import *
 from gra_klasy import Player
 import sys
@@ -63,7 +63,7 @@ class Doorkeeper(threading.Thread):
 			if len(self.server.get_users()) < self.server.max_users:
 				try:
 					conn, addr = self.server.s.accept()
-					self.server.new_user(conn)
+					self.server.new_user(conn, addr)
 				except OSError:
 					print("nie udalo sie")
 					sys.exit()
@@ -74,12 +74,14 @@ class Server:
 	'''
 	
 	def __init__(self):
+		self.lock = threading.RLock()
 		self.HOST = ''
 		self.PORT = 5657
 		self._users = []
 		self._games = []
-		self.max_users = 5
-		self.max_games = 2
+		self._discon = []
+		self.max_users = 40
+		self.max_games = 5
 		self.s = None 
 		self.__first()
 		self.prot = Protocol(self)
@@ -88,12 +90,27 @@ class Server:
 	
 	
 	def get_games(self): return self._games	
+	def get_discon(self): return self._discon
 	
 	def rm_add_game(self, game, b):
-		if b:
-			self._games.remove(game)
-		else:
-			self._games.append(game)
+		self.lock.acquire()
+		try:
+			if b:
+				self._games.remove(game)
+			else:
+				self._games.append(game)
+		finally:
+			self.lock.release()
+	
+	def rm_add_discon(self, user, b):
+		self.lock.acquire()
+		try:
+			if b:
+				self._discon.remove(user)
+			else:
+				self._discon.append(user)
+		finally:
+			self.lock.release()
 	
 	def _send_mail(self, mail, login, address, password):
 		'''
@@ -131,10 +148,14 @@ class Server:
 			return
 	
 	def rm_add_user(self, user, b):
-		if b:
-			self._users.remove(user)
-		else:
-			self._users.append(user)
+		self.lock.acquire()
+		try:
+			if b:
+				self._users.remove(user)
+			else:
+				self._users.append(user)
+		finally:
+			self.lock.release()
 	
 	def _get_hash(self, str):
 		'''
@@ -435,20 +456,23 @@ class Server:
 	#jesli bedzie to szyfrowane to trzeba chyba bedzie zapamietac klucz, bo moze sie bedzie tym samym poslugiwac!!!!!
 	#na razie jest to troche bez sensu napisane
 	def connection_lost(self, user):
-		if user.get_game() != None:
+		if user.get_login() != None:
 			try:
 				sql_rmv_from_game(user.get_login())
 			except:
 				print("sql error - connection lost")
 				#raise ServerError(121)
-		elif user.get_login() != None:
+		'''
+		if user.get_login() == None:
 			try:
 				sql_logout(user.get_login())
 			except:
 				print("sql error - 2 - connection lost")
 				#raise ServerError(121
+		'''
 		try:
 			self.rm_add_user(user, True)
+			self.rm_add_discon(user, False)
 		except:
 			pass
 
@@ -492,15 +516,32 @@ class Server:
 		user.set_game(None)
 		user.get_messanger().answer_user(201, msg)
 	
-	def new_user(self, conn):
+	def in_game(self, conn, address):
+		for u in self.get_discon():
+			if u.addr[0] == address[0]:
+				print(u.addr)
+				u.set_conn(conn)
+				u.set_geisha(Geisha(u, self.prot))
+				self.rm_add_discon(u, True)
+				try:
+					sql_add_to_game(u.get_login())
+				except:
+					print("sql error - powrot do gry")
+					raise ServerError(121, msg)
+					print("powrot")
+				return True
+		return False
+	
+	def new_user(self, conn, address):
 		'''
 		After connecting to the socket user gets the possibility to "converse" with server
 		'''
-		if len(self.get_users()) >= self.max_users:
-			#to pewnie nie zadziala xD
-			conn.send(222)
-			return
-		self.rm_add_user(User(self, conn, self.prot), False)
+		if not(self.in_game(conn, address)):
+			if len(self.get_users()) >= self.max_users:
+				#to pewnie nie zadziala xD
+				conn.send(222)
+				return
+			self.rm_add_user(User(self, conn, address, self.prot), False)
 	
 	def change_pass(self, login, old_pass, new_pass, user, msg = chr(204)):
 		'''

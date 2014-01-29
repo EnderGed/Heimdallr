@@ -22,6 +22,7 @@ class Player:
 		self._team = team
 		
 	def set_alive(self,alive): 
+		self.get_messanger.answer_user(2)
 		self._alive = alive
 		
 	def set_position(self, position):

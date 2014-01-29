@@ -1,10 +1,11 @@
 import threading
 
 class User:
-	def __init__(self, server, conn, prot):
+	def __init__(self, server, conn, addr, prot):
 		self._conn = conn
 		self._messanger = Messanger(self, self._conn)
 		self.server = server
+		self.addr = addr
 		self._prot = prot
 		self._geisha = Geisha(self, self._prot)
 		self._game = None
@@ -59,15 +60,20 @@ class Messanger:
 	def __init__(self, user, conn):
 		self._user = user
 		self._conn = conn
+		self.lock = threading.RLock()
 		
 	def answer_user(self, nr, message=''):
 	#tutaj bedzie przygotowanie do wyslania - prawdziwe wyslanie w innej funkcji - nie bedzie zwalniania
-		msg = bytearray()
-		msg.append(nr)
-		for i in message:
-			msg.append(ord(i))
-		print('nr: ' + str(nr))
-		self.answer(msg)
+		self.lock.acquire()
+		try:
+			msg = bytearray()
+			msg.append(nr)
+			for i in message:
+				msg.append(ord(i))
+			print('nr: ' + str(nr))
+			self.answer(msg)
+		finally:
+			self.lock.release()
 			
 	def answer(self, message):
 		try:
