@@ -4,5 +4,7 @@
     <string name="app_name">Puzzle</string>
     <string name="action_settings">Settings</string>
     <string name="hello_world">Hello world!</string>
-	<string name="button">OBRAZEK</string>
+	<string name="button">poddaje sie</string>
+	<string name="button2">od nowa</string>
+	<string name="timerVal">06:00</string>
 </resources>

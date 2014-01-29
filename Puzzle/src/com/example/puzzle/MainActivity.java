@@ -4,6 +4,12 @@ import android.os.Bundle;
 import android.app.Activity;
 import android.view.Menu;
 
+
+/** 
+ * Main Activity for loading game - puzzle
+ * 
+ * @author Aleksandra Mielcarek 
+ */  
 public class MainActivity extends Activity {
 
 	@Override

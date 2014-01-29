@@ -1,18 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<TableLayout
      xmlns:android="http://schemas.android.com/apk/res/android"
-     android:layout_width="match_parent"
-     android:layout_height="match_parent"
-     android:id="@+id/Board"
-     android:layout_gravity="top"
-     android:orientation="vertical"
-     android:layout_weight="1">
-    <TableLayout
     android:id="@+id/tableLayout1"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent" >
+    android:layout_height="fill_parent">
     <TableRow
         android:id="@+id/tableRow1"
+        android:layout_marginTop="15dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
 		<ImageView
@@ -111,11 +105,31 @@
 		         android:clickable="true"
 		        ></ImageView>
 	</TableRow>
-	</TableLayout>
+	<TableRow
+	 android:id="@+id/tableRow5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp">
 	<Button
         android:id="@+id/button"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="@string/button">
+        android:text="@string/button"
+         android:layout_marginLeft="10dp">
+	</Button><Button
+        android:id="@+id/button2"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="@string/button2"
+        android:layout_marginLeft="10dp">
 	</Button>
-</LinearLayout>
+	<TextView
+	        android:id="@+id/timerValue"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_marginBottom="37dp"
+	        android:textSize="40sp"
+	        android:text="@string/timerVal"  
+	        android:layout_marginLeft="10dp"/>
+	</TableRow>
+</TableLayout>
