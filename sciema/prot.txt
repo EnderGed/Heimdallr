@@ -15,6 +15,7 @@ lobby
 	102 + ID_gry						dolacz do gry		int
 	103									start gry
 	104 + boolean						zmiana/wybór drużyny
+	105									opusc lobby
 	
 inne
 	201 + login + haslo					logowanie		dwa stringi zakonczone \0					
