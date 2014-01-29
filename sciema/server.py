@@ -394,7 +394,7 @@ class Server:
 		for g in self.get_games():
 			if g.id == id:
 				try:
-					g.add_player(user.get_login(), user.get_messanger(), bomb[0][0], bomb[0][1], bomb[0][2], g.teams[0])
+					user.set_player(g.add_player(user.get_login(), user.get_messanger(), bomb[0][0], bomb[0][1], bomb[0][2], g.teams[0]))
 					try:
 						sql_add_game(g.created_by, user.get_login())
 					except:
@@ -437,19 +437,20 @@ class Server:
 			if g == None or g.created_by != user.get_login():
 				raise ServerError(222, msg)
 				print("nie jestes w grze")
-			try:
-				sql_rmv_game(g.id)
-			except:
-				print("sql error 2 - end game")
-				raise ServerError(121, msg)
+			self.send_to_everybody(g, team, 4, chr(1))
 		else:
 			teams = user.get_game().teams
 			if teams[0] == team:
-				send_to_team(g, team, 4, chr(1))
-				send_to_team(g, teams[1], 4, chr(1))
+				self.send_to_team(g, team, 4, chr(1))
+				self.send_to_team(g, teams[1], 4, chr(1))
 			else:
-				send_to_team(g, team, 4, chr(1))
-				send_to_team(g, teams[0], 4, chr(1))
+				self.send_to_team(g, team, 4, chr(1))
+				self.send_to_team(g, teams[0], 4, chr(1))
+		try:
+			sql_rmv_game(g.id)
+		except:
+			print("sql error 2 - end game")
+			raise ServerError(121, msg)
 		self.rm_add_game(g, True)
 		print("Koniec gry")
 	
@@ -586,7 +587,7 @@ class Server:
 		'''
 		print("do zobaczenia")
 		user.geisha.connection = False
-		self.rm_add_user(user)
+		self.rm_add_user(user, True)
 		
 	def new_pass_login(self, address, user, msg = chr(205)):
 		'''
@@ -706,11 +707,12 @@ class Server:
 			raise ServerError(222, msg)
 		try:
 			user.get_game().assign(user.get_player(), user.get_game().teams[team])
-		except GameError:
+		except GameError as e:
+			print(e.msg)
 			raise ServerError(200, msg)
 		user.get_messanger().answer_user(201, msg)
 		msg = chr(team)+user.get_login()
-		send_to_everybody(user.get_game(), 104, msg)
+		self.send_to_everybody(user.get_game(), 104, msg)
 	
 	def solution_puzzle(self, solution, user, msg=chr(5)):
 		'''
@@ -741,7 +743,7 @@ class Server:
 		if len(clue) == 1:
 			end_game(user, user.get_player().get_team(), clue[0])
 		else:
-			send_to_team(user.get_game(), user.get_player().get_team(), clue[0], 5, clue[1])
+			send_to_team(user.get_game(), user.get_player().get_team(), 5, clue)
 	
 	def bomb(self, bomb_to_place, user, msg=chr(2)):
 		'''
