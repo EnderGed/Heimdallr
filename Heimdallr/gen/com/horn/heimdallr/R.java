@@ -67,7 +67,8 @@ public final class R {
     public static final class menu {
         public static final int lobby=0x7f070000;
         public static final int login=0x7f070001;
-        public static final int menu=0x7f070002;
+        public static final int main=0x7f070002;
+        public static final int menu=0x7f070003;
     }
     public static final class string {
         public static final int action_settings=0x7f050002;

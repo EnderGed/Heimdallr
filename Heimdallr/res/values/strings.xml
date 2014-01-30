@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Heimdallr</string>
-    <string name="title_activity_login">Heimdallr Login</string>
+    <string name="app_name">DataSender</string>
     <string name="action_settings">Settings</string>
     <string name="hello_world">Hello world!</string>
-    <string name="title_activity_lobby">Lobby</string>
-    <string name="title_activity_menu">Menu</string>
+    <string name="location">location</string>
 
+    <color name="black">#000000</color>
 </resources>
