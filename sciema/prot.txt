@@ -57,3 +57,4 @@ lobby
 	109 + lista(gracz, druzyna)			lista graczy  string, bool
 	110 + druzyny						dwa stringi zakonczone \0
 	111 + nazwa gracza					z lobby wyszedl(jesli byl w grze, ale jej nie stworzyl, jak stworzyl - koniec gry)
+	112									koniec gry

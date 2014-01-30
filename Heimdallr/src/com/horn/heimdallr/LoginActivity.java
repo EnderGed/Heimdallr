@@ -20,15 +20,18 @@ public class LoginActivity extends Activity {
 	private EditText et_usrname;
 	private EditText et_pswrd;
 	private String playerName;
+	private Context context;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_login);
 		
+		context = this;
+		
 		//ustanawianie polaczenia z internetem
 		tcp.tcpClient = new TCPClient();
-		tcp.tcpClient.setUser(LoginActivity.this,this, loginOnMessageRecieved);
+		tcp.tcpClient.setUser(LoginActivity.this,context, loginOnMessageRecieved);
 		tcp.tcpClient.connect();
 		
 		et_usrname = (EditText)findViewById(R.id.editText_login);
@@ -41,8 +44,8 @@ public class LoginActivity extends Activity {
 			public void onClick(View v) {
 				//if(isConnected)
 				playerName = et_usrname.getText().toString();
-				byte[] a = playerName.getBytes();
-				byte[] b = et_pswrd.getText().toString().getBytes();
+				byte[] a = (playerName+'\0').getBytes();
+				byte[] b = (et_pswrd.getText().toString()+'\0').getBytes();
 				byte[] c = new byte[a.length+b.length+1];
 				c[0] = (byte)201;	//komunikat o logowaniu
 				System.arraycopy(a, 0, c, 1, a.length);
@@ -77,6 +80,8 @@ public class LoginActivity extends Activity {
 				Intent lobby = new Intent(LoginActivity.this,Lobby.class);
 				lobby.putExtra("player", playerName);
 				startActivity(lobby);
+				//po zakonczeniu activity, podłącz się do tcpClienta
+				tcp.tcpClient.setUser(LoginActivity.this, context, loginOnMessageRecieved);
 				
 			} else if(message[0] == (byte)202){
 				//nieprawidlowy login lub haslo
@@ -99,8 +104,8 @@ public class LoginActivity extends Activity {
 				public void onClick(View v) {
 					EditText et_login = (EditText)layout.findViewById(R.id.editText_login_register);
 					EditText et_email = (EditText)layout.findViewById(R.id.editText_email_register);
-					byte[] a = et_login.getText().toString().getBytes();
-					byte[] b = et_email.getText().toString().getBytes();
+					byte[] a = (et_login.getText().toString()+'\0').getBytes();
+					byte[] b = (et_email.getText().toString()+'\0').getBytes();
 					byte[] c = new byte[a.length + b.length + 1];
 					c[0] = (byte)203;
 					System.arraycopy(a, 0, c, 1, a.length);
@@ -142,7 +147,7 @@ public class LoginActivity extends Activity {
 							LayoutInflater inflater = (LayoutInflater)LoginActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 							View layout = inflater.inflate(R.layout.wrong_login, (ViewGroup)findViewById(R.id.popup_wrong_login));
 							EditText et_mail = (EditText)layout.findViewById(R.id.editText1_wrong_login);
-							byte a[] = et_mail.getText().toString().getBytes();
+							byte a[] = (et_mail.getText().toString()+'\0').getBytes();
 							byte b[] = new byte[a.length+1];
 							b[0] = (byte)205;	//nowe haslo
 							System.arraycopy(a, 0, b, 1, a.length);
