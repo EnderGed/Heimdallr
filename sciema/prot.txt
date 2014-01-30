@@ -15,13 +15,12 @@ lobby
 	102 + ID_gry						dolacz do gry		int
 	103									start gry
 	104 + boolean						zmiana/wybór drużyny
-	105									opusc lobby
 	
 inne
 	201 + login + haslo					logowanie		dwa stringi zakonczone \0					
 	202									wylogowanie
 	203 + login + adres					rejestracja
-	204 + sare_haslo nowe_haslo			zmiana hasla????
+	204 + login + sare_haslo nowe_haslo	zmiana hasla????
 	205	+ adres							nowe haslo (zapomniany login)
 	
 	
@@ -56,5 +55,3 @@ lobby
 	108 + id							do gry dolaczyl
 	109 + lista(gracz, druzyna)			lista graczy  string, bool
 	110 + druzyny						dwa stringi zakonczone \0
-	111 + nazwa gracza					z lobby wyszedl(jesli byl w grze, ale jej nie stworzyl, jak stworzyl - koniec gry)
-	112									koniec gry
