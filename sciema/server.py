@@ -318,10 +318,8 @@ class Server:
 		'''
 		if user.get_game() == None or user.get_game().created_by != user.get_login():
 			raise ServerError(222, msg)
-		#to tylko tak teraz, potem bedzie prawdziwy plik!!!
-		file = None
 		try:
-			user.get_game().load_points(file)
+			user.get_game().load_points()
 		except GameError as e:
 			print(e.code)
 			if e == 1:
@@ -335,7 +333,7 @@ class Server:
 			user.get_game().start()
 		except GameError:
 			raise ServerError(222, msg)
-		send_to_everybody(user.get_game(), 10)
+		self.send_to_everybody(user.get_game(), 10)
 	
 	def send_to_everybody(self, game, nr, msg = ''):
 		#do wszystkich w grze
@@ -361,6 +359,7 @@ class Server:
 				msg = msg + chr(0)
 			else:
 				msg = msg + chr(1)
+			msg = msg + chr(0)
 		user.get_messanger().answer_user(109, msg)
 	
 	def join_game(self, id, user, msg = chr(102)):
@@ -410,12 +409,12 @@ class Server:
 				user.get_messanger().answer_user(201, msg)
 				self.send_teams(user)
 				self.list_of_players(g, user)
-				self.send_to_everybody(user.get_game(), 102, chr(0)+user.get_login())
+				self.send_to_everybody(user.get_game(), 102, chr(0)+chr(0)+user.get_login())
 				return
 		print("nie ma takiej gry")
 		raise ServerError(200, msg)
 	
-	def end_game(self, user, team=3, msg = chr(4)):
+	def end_game(self, user, team=3, msg = chr(4), b=False):
 		'''
 		This function ends game
 		Arguments:
@@ -437,15 +436,18 @@ class Server:
 			if g == None or g.created_by != user.get_login():
 				raise ServerError(222, msg)
 				print("nie jestes w grze")
-			self.send_to_everybody(g, team, 4, chr(1))
+			if b:
+				self.send_to_everybody(g, team, 112)
+			else:
+				self.send_to_everybody(g, team, 6, chr(1))
 		else:
 			teams = user.get_game().teams
 			if teams[0] == team:
-				self.send_to_team(g, team, 4, chr(1))
-				self.send_to_team(g, teams[1], 4, chr(1))
+				self.send_to_team(g, team, 6, chr(1))
+				self.send_to_team(g, teams[1], 6, chr(1))
 			else:
-				self.send_to_team(g, team, 4, chr(1))
-				self.send_to_team(g, teams[0], 4, chr(1))
+				self.send_to_team(g, team, 6, chr(1))
+				self.send_to_team(g, teams[0], 6, chr(1))
 		try:
 			sql_rmv_game(g.id)
 		except:
@@ -544,7 +546,7 @@ class Server:
 				return
 			self.rm_add_user(User(self, conn, address, self.prot), False)
 	
-	def change_pass(self, login, old_pass, new_pass, user, msg = chr(204)):
+	def change_pass(self, old_pass, new_pass, user, msg = chr(204)):
 		'''
 		This function change user's password
 		Arguments:
@@ -562,11 +564,13 @@ class Server:
 		121 - database exception
 		200 - login or/and old password is wrong
 		'''
+		if user.get_login() == None:
+			raise ServerError(222, msg)
 		old_pass = self._get_hash(old_pass)
 		new_pass = self._get_hash(new_pass)
 		print("zmiana hasla")
 		try:
-			sql = sql_check_login(login,old_pass)
+			sql = sql_check_login(user.get_login(),old_pass)
 		except:
 			print("sql error - change pass")
 			raise ServerError(121, msg)
@@ -711,7 +715,7 @@ class Server:
 			print(e.msg)
 			raise ServerError(200, msg)
 		user.get_messanger().answer_user(201, msg)
-		msg = chr(team)+user.get_login()
+		msg = chr(teamchr(0)+user.get_login())
 		self.send_to_everybody(user.get_game(), 104, msg)
 	
 	def solution_puzzle(self, solution, user, msg=chr(5)):
@@ -737,9 +741,7 @@ class Server:
 			raise ServerError(222, msg)
 		if solution == 0:
 			raise ServerError(200, msg)
-		point = None
-		#co to jest point?
-		clue = user.get_game().score_point(user.get_player(), point)
+		clue = user.get_game().score_point(user.get_player())
 		if len(clue) == 1:
 			end_game(user, user.get_player().get_team(), clue[0])
 		else:
@@ -773,7 +775,7 @@ class Server:
 	def out_of_lobby(self, from_user):
 		if user.get_game() != None:
 			if user.get_login() == user.get_game.created_by:
-				self.end_game(self, user, team=3, msg = chr(4))
+				self.end_game(user, 3, chr(4), True)
 			else:
 				self.disconnect_user(user)
 				send_to_everyody(user.get_game(), 111)

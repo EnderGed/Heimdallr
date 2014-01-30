@@ -22,6 +22,7 @@ class Player:
 		self._team = team
 		
 	def set_alive(self,alive): 
+		self.get_messanger.answer_user(2)
 		self._alive = alive
 		
 	def set_position(self, position):
@@ -60,7 +61,7 @@ class ObjectOnMap:
 		
 class Point(ObjectOnMap):
 	
-	def __init__(self, x, y, clue):
+	def __init__(self, x, y, r, clue):
 		ObjectOnMap.__init__(self, x, y, r)
 		self.clue = clue
 

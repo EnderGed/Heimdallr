@@ -20,7 +20,11 @@ class User:
 	
 	def get_conn(self): return self._conn
 	def set_conn(self, conn): self._conn = conn
-	def set_messanger(self, messanger): self._messanger = messanger
+	def set_messanger(self, messanger): 
+		self._messanger = messanger
+		p = self.get_player()
+		if p != None:
+			p.set_messanger(messanger)
 	def get_messanger(self): return self._messanger
 	def set_geisha(self, geisha): self._geisha = geisha
 	def get_geisha(self): return self._geisha
