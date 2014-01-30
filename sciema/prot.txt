@@ -21,7 +21,7 @@ inne
 	201 + login + haslo					logowanie		dwa stringi zakonczone \0					
 	202									wylogowanie
 	203 + login + adres					rejestracja
-	204 + login + sare_haslo nowe_haslo	zmiana hasla????
+	204 + sare_haslo nowe_haslo			zmiana hasla????
 	205	+ adres							nowe haslo (zapomniany login)
 	
 	

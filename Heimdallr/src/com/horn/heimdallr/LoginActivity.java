@@ -76,10 +76,9 @@ public class LoginActivity extends Activity {
 		public void messageRecieved(byte[] message, int len) {
 			Log.d("Connection","recieved: "+(message[0]<0?(message[0]+256):message[0]));
 			if(message[0] == (byte)201){
-				//zalogowano poprawnie, przejdz do lobby
-				Intent lobby = new Intent(LoginActivity.this,Lobby.class);
-				lobby.putExtra("player", playerName);
-				startActivity(lobby);
+				//zalogowano poprawnie, przejdz do menu
+				Intent menuAct = new Intent(LoginActivity.this,MenuActivity.class);
+				startActivity(menuAct);
 				//po zakonczeniu activity, podłącz się do tcpClienta
 				tcp.tcpClient.setUser(LoginActivity.this, context, loginOnMessageRecieved);
 				

@@ -29,6 +29,10 @@
             android:name="com.horn.heimdallr.Lobby"
             android:label="@string/title_activity_lobby" >
         </activity>
+        <activity
+            android:name="com.horn.heimdallr.MenuActivity"
+            android:label="@string/title_activity_menu" >
+        </activity>
     </application>
 
 </manifest>

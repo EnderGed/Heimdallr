@@ -25,7 +25,6 @@ public class Lobby extends Activity {
 	private boolean currentTeam;
 	private List<String> team1List;
 	private List<String> team2List;
-	private String playerName;
 	private Context context;
 
 	@Override
@@ -33,9 +32,6 @@ public class Lobby extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_lobby);
 		context = this;
-		Intent intent = getIntent();
-		Bundle extras = intent.getExtras();
-		playerName = (String)extras.get("player");
 		
 		//inicjowanie list drużyn
 		team1List = new ArrayList<String>();
@@ -54,13 +50,6 @@ public class Lobby extends Activity {
 			public void onClick(View v) {
 				currentTeam = !currentTeam;
 				tcp.tcpClient.sendMessage(new byte[]{(byte)104,(byte)(currentTeam == true?1:0)});
-				if(currentTeam == true){
-					team1List.remove(playerName);
-					team2List.add(playerName);
-				} else{
-					team1List.add(playerName);
-					team2List.remove(playerName);
-				}
 			}
 		});
 		b_exitLobby.setOnClickListener(new View.OnClickListener() {
@@ -103,32 +92,72 @@ public class Lobby extends Activity {
 	}
 	
 	private TCPClient.onMessageRecieved lobbyOnMessageRecieved = new TCPClient.onMessageRecieved(){
-		public void messageRecieved(byte[] message, int len) {
+		public void messageRecieved(final byte[] message, int len) {
 			Log.d("Connection","recieved: "+(message[0]<0?(message[0]+256):message[0]));
 			if(message[0] == (byte)101){
-				String[] strs = new String(message).split("\0");
-				tv_team1Name.setText(strs[1]);
-				tv_team2Name.setText(strs[2]);
+				final String[] strs = new String(message).split("\0");
+				runOnUiThread(new Runnable() {
+					
+					@Override
+					public void run() {
+						tv_team1Name.setText(strs[1]);
+						tv_team2Name.setText(strs[2]);
+					}
+				});
 			} else if(message[0] == (byte)102){
-				String[] strs = new String(message).split("\0");
-				Log.d("Lobby","108 "+strs[1]);
-				(message[1] == (byte)0 ? team1List : team2List).add(strs[1]);
+				final String[] strs = new String(message).split("\0");
+				Log.d("Lobby","102 "+strs[1]);
+				runOnUiThread(new Runnable() {
+					
+					@Override
+					public void run() {
+						(message[1] == (byte)0 ? team1List : team2List).add(strs[1]);
+						lv_team1playerList.invalidateViews();
+						lv_team2playerList.invalidateViews();
+					}
+				});
 			} else if(message[0] == (byte)103){
-				tv_gameCode.setText("kod rozgrywki to: "+((Integer)(int)message[1]).toString());
-			} else if(message[0] == (byte)104){
-				String[] strs = new String(message).split("\0");
-				team1List.remove(strs[1]);
-				team2List.remove(strs[1]);
-				(message[1] == (byte)0 ? team1List : team2List).add(strs[1]);
+				runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						tv_gameCode.setText("kod rozgrywki to: "+((Integer)(int)message[1]).toString());
+					}
+				});
+				} else if(message[0] == (byte)104){
+				final String[] strs = new String(message).split("\0");
+				runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						team1List.remove(strs[1]);
+						team2List.remove(strs[1]);
+						(message[1] == (byte)0 ? team1List : team2List).add(strs[1]);
+						lv_team1playerList.invalidateViews();
+						lv_team2playerList.invalidateViews();
+					}
+				});
 			} else if(message[0] == (byte)109){
-				String[] strs = new String(message).split("\0");
-				for(int i=1;i+1<strs.length;i+=2){
-					(strs[i+1].charAt(0) == 0 ? team1List : team2List).add(strs[i]);
-				}
+				final String[] strs = new String(message).split("\0");
+				runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						for(int i=1;i+1<strs.length;i+=2){
+							(strs[i+1].charAt(0) == 0 ? team1List : team2List).add(strs[i]);
+						}
+						lv_team1playerList.invalidateViews();
+						lv_team2playerList.invalidateViews();
+					}
+				});
 			} else if(message[0] == (byte)111){
-				String[] strs = new String(message).split("\0");
-				team1List.remove(strs[1]);
-				team2List.remove(strs[1]);
+				final String[] strs = new String(message).split("\0");
+				runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						team1List.remove(strs[1]);
+						team2List.remove(strs[1]);
+						lv_team1playerList.invalidateViews();
+						lv_team2playerList.invalidateViews();
+					}
+				});
 			} else if(message[0] == (byte)112){
 				Toast.makeText(context, "Twórca wyszedł z lobby\nrozgrywka zakończona.", Toast.LENGTH_SHORT).show();
 				((Activity)context).finish();

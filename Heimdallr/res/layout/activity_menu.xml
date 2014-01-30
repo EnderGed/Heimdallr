@@ -1,0 +1,76 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:orientation="vertical"
+    tools:context=".MenuActivity" >
+
+<EditText
+    android:id="@+id/menu_et_team1"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:ems="10"
+    android:hint="nazwa drużyny" />
+
+<EditText
+    android:id="@+id/menu_et_team2"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:ems="10"
+    android:hint="nazwa drużyny" />
+
+<Button
+    android:id="@+id/menu_b_create_game"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="Nowa gra" />
+
+<EditText
+    android:id="@+id/menu_et_gameId"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:ems="10"
+    android:inputType="number"
+    android:hint="id gry" />
+
+<Button
+    android:id="@+id/menu_b_join_game"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="Dołącz" />
+
+<EditText
+    android:id="@+id/menu_et_old_password"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:ems="10"
+    android:inputType="textPassword"
+    android:hint="stare hasło" />
+
+<EditText
+    android:id="@+id/menu_et_new_password1"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:ems="10"
+    android:inputType="textPassword"
+    android:hint="nowe hasło" />
+
+<EditText
+    android:id="@+id/menu_et_new_password2"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:ems="10"
+    android:inputType="textPassword"
+    android:hint="potwierdź nowe hasło" />
+
+<Button
+    android:id="@+id/menu_b_change_password"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="Zmień hasło" />
+
+</LinearLayout>
