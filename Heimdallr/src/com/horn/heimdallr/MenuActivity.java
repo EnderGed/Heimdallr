@@ -41,6 +41,8 @@ public class MenuActivity extends Activity {
 		Button b_createGame = (Button)findViewById(R.id.menu_b_create_game);
 		Button b_joinGame = (Button)findViewById(R.id.menu_b_join_game);
 		Button b_changePswrd = (Button)findViewById(R.id.menu_b_change_password);
+		Button b_logout = (Button)findViewById(R.id.menu_b_logout);
+		
 		b_createGame.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -48,6 +50,9 @@ public class MenuActivity extends Activity {
 				byte[] b = (team2name.getText().toString()+'\0').getBytes();
 				byte[] c = new byte[a.length + b.length + 1];
 				c[0] = (byte)101;
+				System.arraycopy(a, 0, c, 1, a.length);
+				System.arraycopy(b, 0, c, a.length+1, b.length);
+				tcp.tcpClient.sendMessage(c);
 			}
 		});
 		
@@ -70,12 +75,24 @@ public class MenuActivity extends Activity {
 					byte[] b = (npsw1+'\0').getBytes();
 					byte[] c = new byte[a.length + b.length + 1];
 					c[0] = (byte)204;
+					System.arraycopy(a, 0, c, 1, a.length);
+					System.arraycopy(b, 0, c, a.length+1, b.length);
+					tcp.tcpClient.sendMessage(c);
+					
 				} else{
 					Toast.makeText(context, "nowe hasła się nie zgadzają", Toast.LENGTH_SHORT).show();
 				}
 			}
 		});
 		
+		b_logout.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				tcp.tcpClient.sendMessage(new byte[]{(byte)202});
+				((Activity)context).finish();
+			}
+		});
 	}
 
 	@Override
@@ -87,17 +104,35 @@ public class MenuActivity extends Activity {
 	
 	private TCPClient.onMessageRecieved menuOnMessageRecieved = new TCPClient.onMessageRecieved(){
 		public void messageRecieved(final byte[] message, int len) {
-			if(message[0] == 200 && message[1] == 102){
-				Toast.makeText(context, "gra o podanym id nie istnieje", Toast.LENGTH_SHORT).show();
-			} else if(message[0] == 200 && message[1] == 204){
-				Toast.makeText(context, "stare hasło się nie zgadza", Toast.LENGTH_SHORT).show();
-			} else if(message[0] == 201 && (message[1] == 102 || message[1] == 101)){
+			if(message[0] == (byte)200 && message[2] == (byte)102){
+				runOnUiThread(new Runnable() {
+					public void run() {
+						Toast.makeText(context, "gra o podanym id nie istnieje", Toast.LENGTH_SHORT).show();						
+					}
+				});
+			} else if(message[0] == (byte)200 && message[2] == (byte)204){
+				runOnUiThread(new Runnable(){
+					public void run(){
+						Toast.makeText(context, "stare hasło się nie zgadza", Toast.LENGTH_SHORT).show();
+					}
+				});
+			} else if(message[0] == (byte)201 && (message[2] == (byte)102 || message[2] == (byte)101)){
 				Intent lobby = new Intent(MenuActivity.this,Lobby.class);
 				startActivity(lobby);
 				//po zakonczeniu activity, podłącz się do tcpClienta
 				tcp.tcpClient.setUser(MenuActivity.this, context, menuOnMessageRecieved);
+			} else if(message[0] == (byte)202){
+				runOnUiThread(new Runnable() {
+					
+					@Override
+					public void run() {
+						// TODO Auto-generated method stub
+						Toast.makeText(context, "zmień hasło!", Toast.LENGTH_LONG).show();
+						
+					}
+				});
 			} else{
-				Log.e("Menu",new String(message));
+				Log.e("Menu",""+ message[1] + " "+message[2]);
 			}
 		}
 	};

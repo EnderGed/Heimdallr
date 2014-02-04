@@ -15,7 +15,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 public class TCPClient{
-	public static final int PORT = 5657;
+	public static final int PORT = 5657;//64480;
 	public static final String IP = "192.168.43.184";//"192.168.1.82";		//"89.171.250.203";
 	private static final int MSGMAXLENGTH = 100;
 	//private OnMessageReceived messageListener = null;
@@ -30,6 +30,7 @@ public class TCPClient{
 	}
 	
 	public void setUser(Activity act, Context ctx, onMessageRecieved onMRecieved){
+		Log.d("TCPClient", "setUser: "+ctx.getClass().getCanonicalName());
 		activity = act;
 		context = ctx;
 		omr = onMRecieved;
@@ -57,8 +58,10 @@ public class TCPClient{
 				out = socket.getOutputStream();
 				while(isRunning){
 					bytesRead = in.read(msg);
-					if(bytesRead != -1)
+					if(bytesRead != -1){
+						Log.d("TCPClient", "recieved: "+(msg[0]<0?msg[0]+256:msg[0]));
 						omr.messageRecieved(msg, bytesRead);
+					}
 				}
 				in.close();
 				out.close();
@@ -85,6 +88,7 @@ public class TCPClient{
 		if(isRunning){
 			try {
 				out.write(message,0,message.length);
+				Log.d("TCPClient","sending: "+(message[0]<0?message[0]+256:message[0]));
 			} catch (IOException e) {
 				Log.e("TCPClient","Sending error");
 			}

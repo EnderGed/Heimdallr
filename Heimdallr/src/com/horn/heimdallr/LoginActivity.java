@@ -75,16 +75,24 @@ public class LoginActivity extends Activity {
 	private TCPClient.onMessageRecieved loginOnMessageRecieved = new TCPClient.onMessageRecieved(){
 		public void messageRecieved(byte[] message, int len) {
 			Log.d("Connection","recieved: "+(message[0]<0?(message[0]+256):message[0]));
-			if(message[0] == (byte)201){
+			if(message[0] == (byte)201 && message[2] == (byte)201){
 				//zalogowano poprawnie, przejdz do menu
 				Intent menuAct = new Intent(LoginActivity.this,MenuActivity.class);
-				startActivity(menuAct);
-				//po zakonczeniu activity, podłącz się do tcpClienta
-				tcp.tcpClient.setUser(LoginActivity.this, context, loginOnMessageRecieved);
+				startActivityForResult(menuAct,1);
 				
 			} else if(message[0] == (byte)202){
 				//nieprawidlowy login lub haslo
 				wrongLoginOrPassword();
+			} else if(message[0] == (byte)222){
+				runOnUiThread(new Runnable() {
+					
+					@Override
+					public void run() {
+						Toast.makeText(context, "jesteś już zalogowany", Toast.LENGTH_SHORT).show();
+					}
+				});
+				Intent menuAct = new Intent(LoginActivity.this,MenuActivity.class);
+				startActivityForResult(menuAct,1);
 			}
 		}
 	};

@@ -73,4 +73,10 @@
     android:layout_height="wrap_content"
     android:text="Zmień hasło" />
 
+<Button
+    android:id="@+id/menu_b_logout"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="wyloguj" />
+
 </LinearLayout>

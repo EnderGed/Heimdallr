@@ -3,6 +3,8 @@ package com.horn.heimdallr;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.horn.game.MainActivity;
+
 import android.os.Bundle;
 import android.app.Activity;
 import android.content.Context;
@@ -94,7 +96,7 @@ public class Lobby extends Activity {
 	private TCPClient.onMessageRecieved lobbyOnMessageRecieved = new TCPClient.onMessageRecieved(){
 		public void messageRecieved(final byte[] message, int len) {
 			Log.d("Connection","recieved: "+(message[0]<0?(message[0]+256):message[0]));
-			if(message[0] == (byte)101){
+			if(message[0] == (byte)101){		//przesłanie nazw drużyn
 				final String[] strs = new String(message).split("\0");
 				runOnUiThread(new Runnable() {
 					
@@ -104,38 +106,38 @@ public class Lobby extends Activity {
 						tv_team2Name.setText(strs[2]);
 					}
 				});
-			} else if(message[0] == (byte)102){
+			} else if(message[0] == (byte)102){			//gracz dołączył do drużyny
 				final String[] strs = new String(message).split("\0");
-				Log.d("Lobby","102 "+strs[1]);
+				Log.d("Lobby","102 "+strs[2]);
 				runOnUiThread(new Runnable() {
 					
 					@Override
 					public void run() {
-						(message[1] == (byte)0 ? team1List : team2List).add(strs[1]);
+						(message[2] == (byte)1 ? team1List : team2List).add(strs[2]);
 						lv_team1playerList.invalidateViews();
 						lv_team2playerList.invalidateViews();
 					}
 				});
-			} else if(message[0] == (byte)103){
+			} else if(message[0] == (byte)103){		//stworzono rozgrywkę o ID
 				runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
-						tv_gameCode.setText("kod rozgrywki to: "+((Integer)(int)message[1]).toString());
+						tv_gameCode.setText("kod rozgrywki to: "+((Integer)(int)message[2]).toString());
 					}
 				});
-				} else if(message[0] == (byte)104){
+			} else if(message[0] == (byte)104){		//gracz zmienił drużynę
 				final String[] strs = new String(message).split("\0");
 				runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
 						team1List.remove(strs[1]);
 						team2List.remove(strs[1]);
-						(message[1] == (byte)0 ? team1List : team2List).add(strs[1]);
+						(message[2] == (byte)1 ? team1List : team2List).add(strs[2]);
 						lv_team1playerList.invalidateViews();
 						lv_team2playerList.invalidateViews();
 					}
 				});
-			} else if(message[0] == (byte)109){
+			} else if(message[0] == (byte)109){		//lista graczy
 				final String[] strs = new String(message).split("\0");
 				runOnUiThread(new Runnable() {
 					@Override
@@ -147,7 +149,7 @@ public class Lobby extends Activity {
 						lv_team2playerList.invalidateViews();
 					}
 				});
-			} else if(message[0] == (byte)111){
+			} else if(message[0] == (byte)111){			//gracz opuścił lobby
 				final String[] strs = new String(message).split("\0");
 				runOnUiThread(new Runnable() {
 					@Override
@@ -158,9 +160,12 @@ public class Lobby extends Activity {
 						lv_team2playerList.invalidateViews();
 					}
 				});
-			} else if(message[0] == (byte)112){
+			} else if(message[0] == (byte)112){			//twórca wyszedł z lobby, koniec rozgrywki
 				Toast.makeText(context, "Twórca wyszedł z lobby\nrozgrywka zakończona.", Toast.LENGTH_SHORT).show();
 				((Activity)context).finish();
+			} else if(message[0] == (byte)10){
+				Intent mainAct = new Intent(Lobby.this,MainActivity.class);
+				startActivity(mainAct);
 			} else{
 				Log.e("Connection","recieved: "+(message[0]<0?(message[0]+256):message[0]));
 			}
