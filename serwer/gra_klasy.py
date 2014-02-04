@@ -1,6 +1,6 @@
 class Player:
 	
-	def __init__(self, ID, messanger, bomb_limit, bombs_in_inventory, bomb_radius, team=0, position=None):
+	def __init__(self, ID, messanger, team, bomb_limit, bombs_in_inventory, bomb_radius, position=None):
 		self._ID = ID
 		self._position = position
 		self._team = team

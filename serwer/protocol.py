@@ -14,6 +14,8 @@ class Protocol:
 		print(order)
 		try:
 			if order == 1:
+				for i in w:
+					print(i)
 				l1 = None
 				l2 = None
 				try:
@@ -54,14 +56,13 @@ class Protocol:
 			elif order == 103:
 				self.server.start_game(from_user)
 			elif order == 104:
-				self.server.change_team(int(w[1]), from_user)
+				self.server.change_team(from_user)
 			elif order == 105:
 				self.server.out_of_lobby(from_user)
 			elif order == 201:
 				message = ''
 				for i in w[1::]:
 					message = message + chr(i)
-					print(i)
 				message = message.split(chr(0))
 				print(message)
 				self.server.login(message[0], message[1], from_user)

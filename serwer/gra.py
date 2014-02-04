@@ -23,8 +23,10 @@ class GameError(Exception):
 			4 : 'no such ID'
 		}[code]
 
+
+directory = ''
+		
 class Game():
-	directory = 'point_data/'
 	def __init__(self, user_id, teams):
 		'''
 		phase - np. przed rozpoczeciem, rozpoczeta
@@ -36,7 +38,6 @@ class Game():
 		self.players = []
 		self.points = None
 		self.teams = teams
-		
 		self.not_active_bombs = PriorityQueue()
 		self.active_bombs = deque()
 		self.exploding_bombs = deque()
@@ -46,8 +47,8 @@ class Game():
 	def get_phase(self): 
 		return self.phase
 	
-	def create_id(size=5):
-		return randint(10000,99999)
+	def create_id(self):
+		return randint(0,255)
 	
 	#before start
 	def add_player(self, ID, messanger, team=0, bomb_limit=10, bombs_in_inventory=10, bomb_radius=100):
@@ -88,7 +89,7 @@ class Game():
 		#check if everything else is done
 		if self.get_phase() != 0: raise GameError(1)
 		if len(self.teams) != 2: raise GameError(2,'number of teams should be 2: '+str(len(self.teams)))
-		if len(self.players) < 5: raise GameError(2,'should have more than 5 players: '+str(len(self.players)))
+		if len(self.players) < 1: raise GameError(2,'should have more than 5 players: '+str(len(self.players)))
 		for p in self.players:
 			if not p.is_ready(): raise GameError(1,'some players not ready')
 			
@@ -97,15 +98,15 @@ class Game():
 		self.players = tuple(self.players)
 		
 			
-		l1 = get_points(directory+'pointsA.csv')
-		l2 = get_points(directory+'pointsB.csv')
+		l1 = get_points('pointsA.csv')
+		l2 = get_points('pointsB.csv')
 		self.points = {self.teams[0]: (l1,0), self.teams[1]: (l2,0)}
 		self.phase = 2
 		
 	def start(self):
 		if self.get_phase() != 2: raise GameError(1)
 		self.phase = 3
-		Exploder(self).start()
+		self.Exploder(self).start()
 		
 		
 		
@@ -126,23 +127,23 @@ class Game():
 			self.game = game
 		
 		def run(self):
-			while game.get_phase() == 3:
+			while self.game.get_phase() == 3:
 				time.sleep(10)
 				
 				#activate bombs
 				try:
-					time, bomb = game.not_active_bombs.get_nowait()
-					if time < time.time():
-						game.active_bombs.append(bomb)
+					tme, bomb = self.game.not_active_bombs.get_nowait()
+					if tme < time.time():
+						self.game.active_bombs.append(bomb)
 					else:
-						game.not_active_bombs.put_nowait((time,bomb))
+						self.game.not_active_bombs.put_nowait((tme,bomb))
 				except: pass
 				
 				#explode bombs
 				try:
-					for time, bomb in game.exploding_bombs:
-						if time < time.time():
-							for player in filter(bomb.will_explode, game.players):
+					for tme, bomb in self.game.exploding_bombs:
+						if tme < time.time():
+							for player in filter(bomb.will_explode, self.game.players):
 								player.set_alive(False)
 								#send info to player
 				except: pass
