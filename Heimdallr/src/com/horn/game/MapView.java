@@ -43,10 +43,10 @@ public class MapView extends SurfaceView{
         this.setWillNotDraw(false);
         mapHeight = map.getHeight();
         mapWidth = map.getWidth();
-        minLongitude = 16.969702;
-        gpsWidth = 16.977545 - minLongitude;
-        maxLatitude = 51.038884;
-        gpsHeight = maxLatitude - 51.034526;
+        minLongitude = 17.05;
+        gpsWidth = 17.075 - minLongitude;
+        maxLatitude = 51.111;
+        gpsHeight = maxLatitude - 51.105;
         mapHeightInMeters = distFrom(maxLatitude - gpsHeight,minLongitude,maxLatitude,minLongitude) * 1000;
         mapWidthInMeters = distFrom(maxLatitude,minLongitude,maxLatitude,minLongitude+gpsWidth) * 1000;
         x = 0;

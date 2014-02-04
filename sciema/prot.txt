@@ -1,5 +1,6 @@
-wszystkie komunikaty kończymy EOF
 maksymalny rozmiar komunikatu 1024 bajtów? więcej?
+
+uwaga: bool niech będzie: 1, 2, wtedy 0 rozdziela stringi
 
 użytkownik -> serwer
 
@@ -27,12 +28,13 @@ inne
 serwer -> użytkownik
 
 zwykłe odpowiedzi
-	201	+ nr polecenia				ok
 	200	+ nr polecenia				zle
+	201	+ nr polecenia				ok
+	202		zmien haslo	(po wyslaniu wiadomosci na maila - rejestracja, zapomniane haslo)
+	203								połączyłeś się z serwerem i nie jesteś zalogowany
 	222	+ nr polecenia				serwer nie może wykonać tego polecenia
 	121	+ nr polecenia				problem z baza danych
 
-	202		zmien haslo	(po wyslaniu wiadomosci na maila - rejestracja, zapomniane haslo)
 	
 gra
 	1 									wszedłeś w bombe
@@ -48,10 +50,12 @@ gra
 	10 									start gry
 	
 lobby
-	101 + nazwy (2 stringi z \0)		drużyny
-	102 + bool drużyna + nazwa gracza	gracz dołączył do gry
+	102 + bool drużyna + nazwa gracza	gracz dołączył do gry	//po boolu też jest 0
 	103 + ID gry						stworzono rozgrywke
-	104 + bool drużyna + nazwa gracza	gracz zmienil druzyne
+	104 + bool drużyna + nazwa gracza	gracz zmienil druzyne	//po boolu też jest 0
 	108 + id							do gry dolaczyl
-	109 + lista(gracz, druzyna)			lista graczy  string, bool
-	110 + druzyny						dwa stringi zakonczone \0
+	109 + lista(gracz, druzyna)			lista graczy  string, bool	//po kazdym graczu, po
+										kazdym boolu jest 0
+	110 + nazwy (2 stringi z \0)		drużyny
+	111 + nazwa gracza					gracz opuścił lobby
+	112									koniec lobby - twórca opuścił grę

@@ -75,14 +75,16 @@ public class LoginActivity extends Activity {
 	private TCPClient.onMessageRecieved loginOnMessageRecieved = new TCPClient.onMessageRecieved(){
 		public void messageRecieved(byte[] message, int len) {
 			Log.d("Connection","recieved: "+(message[0]<0?(message[0]+256):message[0]));
-			if(message[0] == (byte)201 && message[2] == (byte)201){
+			if(message[0] == (byte)200){
+				//nieprawidlowy login lub haslo
+				wrongLoginOrPassword();
+			} else if(message[0] == (byte)201 && message[2] == (byte)201){
 				//zalogowano poprawnie, przejdz do menu
 				Intent menuAct = new Intent(LoginActivity.this,MenuActivity.class);
 				startActivityForResult(menuAct,1);
-				
-			} else if(message[0] == (byte)202){
-				//nieprawidlowy login lub haslo
-				wrongLoginOrPassword();
+			} else if(message[0] == (byte)203){
+				//połączono z serwerem, który nie wie kim jesteś
+				//tak trzymać!
 			} else if(message[0] == (byte)222){
 				runOnUiThread(new Runnable() {
 					
@@ -93,6 +95,8 @@ public class LoginActivity extends Activity {
 				});
 				Intent menuAct = new Intent(LoginActivity.this,MenuActivity.class);
 				startActivityForResult(menuAct,1);
+			} else{
+				Log.e("Login",""+ (message[2]<0?message[2]+256:message[2]));
 			}
 		}
 	};
@@ -169,6 +173,17 @@ public class LoginActivity extends Activity {
 			}
 		});
 		
+	}
+	
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (requestCode == 1) {
+			if(resultCode == RESULT_OK){
+				Log.e("Login", "menu return with: " + data.getStringExtra("result"));          
+		    }
+		    if (resultCode == RESULT_CANCELED) {    
+		        tcp.tcpClient.setUser(LoginActivity.this, context, loginOnMessageRecieved);
+		    }
+		}
 	}
 
 	@Override

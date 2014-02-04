@@ -15,8 +15,8 @@ import android.util.Log;
 import android.widget.Toast;
 
 public class TCPClient{
-	public static final int PORT = 5657;//64480;
-	public static final String IP = "192.168.43.184";//"192.168.1.82";		//"89.171.250.203";
+	public static final int PORT = 4747;
+	public static final String IP = "192.168.43.44";		//"89.171.250.203";
 	private static final int MSGMAXLENGTH = 100;
 	//private OnMessageReceived messageListener = null;
 	private boolean isRunning = false;
@@ -102,6 +102,7 @@ public class TCPClient{
 		if(isRunning){
 			try {
 				out.write(message,0,len);
+				Log.d("TCPClient","sending: "+(message[0]<0?message[0]+256:message[0]));
 			} catch (IOException e) {
 				Log.e("TCPClient","Sending error");
 			}

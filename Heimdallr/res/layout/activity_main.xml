@@ -9,7 +9,7 @@
     android:background="@color/black"
     tools:context=".MainActivity" >
 
-    <com.horn.heimallr.MapView
+    <com.horn.game.MapView
         android:id="@+id/mapView1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

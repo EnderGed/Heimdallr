@@ -60,8 +60,8 @@ public class MapView extends SurfaceView{
 
     @Override
     protected void onDraw(Canvas canvas) {
-    	android.util.Log.e("MapView","onDraw");
-        android.util.Log.d("MapView","Map size [m]: "+mapWidthInMeters+" "+mapHeightInMeters);
+    	//android.util.Log.e("MapView","onDraw");
+        //android.util.Log.d("MapView","Map size [m]: "+mapWidthInMeters+" "+mapHeightInMeters);
         Canvas g = canvas;
         //rysowanie mapy
         if (map != null) {
@@ -116,16 +116,16 @@ public class MapView extends SurfaceView{
     
     public void updateMapPosition(double latitude, double longitude){
     	//wyznacenie srodka, procentowo na mapie
-    	android.util.Log.d("mapView",latitude+" "+longitude);
+    	//android.util.Log.d("mapView",latitude+" "+longitude);
     	latitude = maxLatitude - latitude;
     	longitude = longitude - minLongitude;
-    	android.util.Log.d("mapView",latitude+" "+longitude);
-    	android.util.Log.d("mapView",gpsWidth+" "+gpsHeight);
+    	//android.util.Log.d("mapView",latitude+" "+longitude);
+    	//android.util.Log.d("mapView",gpsWidth+" "+gpsHeight);
     	
     	//wyznaczenie srodkowego piksela
     	int midX = (int)(longitude*mapWidth/gpsWidth);
     	int midY = (int)(latitude*mapHeight/gpsHeight);
-    	android.util.Log.d("mapView",midX+" "+midY);
+    	//android.util.Log.d("mapView",midX+" "+midY);
     	
     	//wyznaczenie x, y - lewego, gornego rogu
     	x = midX - viewHalfWidth;

@@ -7,7 +7,6 @@ import com.horn.heimdallr.TCPClient;
 import com.horn.heimdallr.tcp;
 
 import android.os.Bundle;
-import android.os.AsyncTask;
 import android.app.Activity;
 import android.content.Context;
 import android.util.Log;

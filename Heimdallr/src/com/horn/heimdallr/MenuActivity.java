@@ -90,7 +90,7 @@ public class MenuActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				tcp.tcpClient.sendMessage(new byte[]{(byte)202});
-				((Activity)context).finish();
+				endActivity();
 			}
 		});
 	}
@@ -118,9 +118,15 @@ public class MenuActivity extends Activity {
 				});
 			} else if(message[0] == (byte)201 && (message[2] == (byte)102 || message[2] == (byte)101)){
 				Intent lobby = new Intent(MenuActivity.this,Lobby.class);
-				startActivity(lobby);
-				//po zakonczeniu activity, podłącz się do tcpClienta
-				tcp.tcpClient.setUser(MenuActivity.this, context, menuOnMessageRecieved);
+				startActivityForResult(lobby,2);
+			} else if(message[0] == (byte)201 && message[2] == (byte)204){
+				runOnUiThread(new Runnable() {
+					
+					@Override
+					public void run() {
+						Toast.makeText(context, "hasło zmienione", Toast.LENGTH_SHORT).show();
+					}
+				});
 			} else if(message[0] == (byte)202){
 				runOnUiThread(new Runnable() {
 					
@@ -131,10 +137,35 @@ public class MenuActivity extends Activity {
 						
 					}
 				});
+			} else if(message[0] == (byte)203){
+				endActivity();
 			} else{
-				Log.e("Menu",""+ message[1] + " "+message[2]);
+				Log.e("Menu",""+ (message[2]<0?message[2]+256:message[2]));
 			}
 		}
 	};
+	
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (requestCode == 2) {
+			if(resultCode == RESULT_OK){
+				String result = data.getStringExtra("result");
+				Log.d("Menu", "lobby return with: " + result);
+				if(result.equals("new_connection")){		//serwer nie pamięta połączenia - cofnąć się do logowania
+					endActivity();
+				} else{
+					Log.e("Menu","omg, what's happening here!?");
+				}
+		    }
+		    if (resultCode == RESULT_CANCELED) {    
+		        tcp.tcpClient.setUser(MenuActivity.this, context, menuOnMessageRecieved);
+		    }
+		}
+	}
+	
+	private void endActivity(){
+		Intent returnIntent = new Intent();
+		setResult(RESULT_CANCELED, returnIntent);
+		((Activity)context).finish();
+	}
 
 }

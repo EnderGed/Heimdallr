@@ -18,7 +18,8 @@
         android:theme="@style/AppTheme" >
         <activity
             android:name="com.horn.heimdallr.LoginActivity"
-            android:label="@string/title_activity_login" >
+            android:label="@string/title_activity_login"
+    		android:screenOrientation="portrait" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -27,15 +28,18 @@
         </activity>
         <activity
             android:name="com.horn.heimdallr.Lobby"
-            android:label="@string/title_activity_lobby" >
+            android:label="@string/title_activity_lobby"
+    		android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name="com.horn.heimdallr.MenuActivity"
-            android:label="@string/title_activity_menu" >
+            android:label="@string/title_activity_menu"
+    		android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name="com.horn.game.MainActivity"
-            android:label="@string/title_activity_main" >
+            android:label="@string/title_activity_main"
+    		android:screenOrientation="portrait" >
         </activity>
     </application>
 
